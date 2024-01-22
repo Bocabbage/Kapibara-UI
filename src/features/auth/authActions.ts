@@ -3,7 +3,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit'
 
 const apiServerURL = import.meta.env.SERVER_URL
 
-interface LoginParamsForm {
+export interface LoginParamsForm {
     account: string;
     password: string;
 }
