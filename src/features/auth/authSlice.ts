@@ -1,76 +1,80 @@
-import axios from 'axios'
-import { createAsyncThunk } from '@reduxjs/toolkit'
+import { createSlice } from '@reduxjs/toolkit'
+import { userRegister, userLogin } from './authActions'
 
-const apiServerURL = import.meta.env.SERVER_URL
-
-interface LoginParamsForm {
-    account: string;
-    password: string;
+// Type definitions
+type AuthState = {
+    loading: boolean,
+    userInfo: string | null,
+    accessToken: string | null,
+    error: string | null,
+    success: boolean,
 }
 
-interface RegisterParamsForm {
-    account: string;
-    username: string;
-    password: string;
+// [todo] add support for sessionStorage
+const accessToken = localStorage.getItem('access_token') ?
+                    localStorage.getItem('access_token') :
+                    null
+
+const initialState: AuthState = {
+    loading: false,
+    userInfo: null,
+    accessToken,
+    error: null,
+    success: false
 }
 
-export const userLogin = createAsyncThunk(
-    'auth/login',
-    async(params: LoginParamsForm, { rejectWithValue }) => {
-        try {
-            const { account, password } = params
-
-            const config = {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            }
-
-            const { data } = await axios.post(
-                `${apiServerURL}/auth/login`,
-                { account, password },
-                config
-            )
-
-            // [todo] add session storage option
-            localStorage.setItem('access_token', data.access_token)
-
-            return data
-        } catch (error: any) {
-            if (error.response && error.response.data.message) {
-                return rejectWithValue(error.response.data.message)
-            } else {
-                return rejectWithValue(error.message)
-            }
+const authSlice = createSlice({
+    name: 'auth',
+    initialState,
+    reducers: {
+        logout: (state: AuthState) => {
+            // [todo] add sessionStorage support
+            localStorage.removeItem('access_token')
+            state.loading = false
+            state.userInfo = null
+            state.accessToken = null
+            state.error = null
+        },
+        setCredentials: (state: AuthState, { payload }) => {
+            state.userInfo = payload
         }
-    }
-)
+    },
+    extraReducers: (builder) => {
+        builder
+            // user login
+            .addCase(userLogin.pending, (state: AuthState) => {
+                state.loading = true
+                state.error = null
+            })
+            .addCase(userLogin.fulfilled, (state: AuthState, { payload }) => {
+                state.loading = false
+                state.error = null
+                state.userInfo = payload
+                state.accessToken = payload.access_token
+            })
+            .addCase(userLogin.rejected, (state: AuthState, { payload }) => {
+                let errorMsg = payload as string
+                state.loading = false
+                state.error = errorMsg
+            })
+            // user register
+            .addCase(userRegister.pending, (state: AuthState) => {
+                state.loading = true
+                state.error = null
+            })
+            .addCase(userRegister.fulfilled, (state: AuthState) => {
+                state.loading = false
+                state.error = null
+                state.success = true
+            })
+            .addCase(userRegister.rejected, (state: AuthState, { payload }) => {
+                let errorMsg = payload as string
+                state.loading = false
+                state.error = errorMsg
+            })
+    },
+        
+})
 
-export const userRegister = createAsyncThunk(
-    'auth/register',
-    async(params: RegisterParamsForm, { rejectWithValue }) => {
-        try {
-            const { account, username, password } = params
-
-            const config = {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            }
-
-            const { data } = await axios.post(
-                `${apiServerURL}/auth/register`,
-                { account, username, password },
-                config
-            )
-
-            return data
-        } catch (error: any) {
-            if (error.response && error.response.data.message) {
-                return rejectWithValue(error.response.data.message)
-            } else {
-                return rejectWithValue(error.message)
-            }
-        }
-    }
-)
+export const { logout, setCredentials } = authSlice.actions
+export default authSlice.reducer
