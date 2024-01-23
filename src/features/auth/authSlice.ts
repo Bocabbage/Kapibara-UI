@@ -20,7 +20,7 @@ const initialState: AuthState = {
     accessToken,
     error: null,
     success: false,
-    isLoggedIn: true,
+    isLoggedIn: false,
 }
 
 const authSlice = createSlice({
