@@ -1,3 +1,4 @@
+// Async Request Redux
 import axios from 'axios'
 import { createAsyncThunk } from '@reduxjs/toolkit'
 
@@ -14,8 +15,12 @@ interface RegisterParamsForm {
     password: string;
 }
 
+// When dispatch an userLogin(), first dispatch a 'pending' action,
+// after the async-function finished, dispatch another action of 'fulfilled'/'reject'
 export const userLogin = createAsyncThunk(
+     // action prefix
     'auth/login',
+    // payload creator
     async (params: LoginParamsForm, { rejectWithValue }) => {
         try {
             const { account, password } = params

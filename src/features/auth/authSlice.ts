@@ -42,6 +42,8 @@ const authSlice = createSlice({
     extraReducers: (builder) => {
         builder
             // user login
+            // userLogin is an AsyncThunk obj and pending/fulfilled/ are 'actions' of userLogin
+            // so add reducers to process: builder.addCase(action, reducer)
             .addCase(userLogin.pending, (state: AuthState) => {
                 state.loading = true
                 state.error = null

@@ -19,6 +19,7 @@ export default function Login() {
 
     const submitForm = (data: any) => {
         let formData = data as LoginParamsForm
+        // dispatch function can accept the thunk object as parameter directly
         dispatch(userLogin(formData))
     }
 
