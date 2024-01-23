@@ -8,19 +8,19 @@ type AuthState = {
     accessToken: string | null,
     error: string | null,
     success: boolean,
+    isLoggedIn: boolean,
 }
 
 // [todo] add support for sessionStorage
-const accessToken = localStorage.getItem('access_token') ?
-                    localStorage.getItem('access_token') :
-                    null
+const accessToken = localStorage.getItem('access_token')
 
 const initialState: AuthState = {
     loading: false,
     userInfo: null,
     accessToken,
     error: null,
-    success: false
+    success: false,
+    isLoggedIn: true,
 }
 
 const authSlice = createSlice({
@@ -34,6 +34,7 @@ const authSlice = createSlice({
             state.userInfo = null
             state.accessToken = null
             state.error = null
+            state.isLoggedIn = false
         },
         setCredentials: (state: AuthState, { payload }) => {
             state.userInfo = payload
@@ -46,6 +47,7 @@ const authSlice = createSlice({
             // so add reducers to process: builder.addCase(action, reducer)
             .addCase(userLogin.pending, (state: AuthState) => {
                 state.loading = true
+                state.isLoggedIn = false
                 state.error = null
             })
             .addCase(userLogin.fulfilled, (state: AuthState, { payload }) => {
@@ -53,9 +55,11 @@ const authSlice = createSlice({
                 state.error = null
                 state.userInfo = payload
                 state.accessToken = payload.access_token
+                state.isLoggedIn = true
             })
             .addCase(userLogin.rejected, (state: AuthState, { payload }) => {
                 let errorMsg = payload as string
+                state.isLoggedIn = false
                 state.loading = false
                 state.error = errorMsg
             })
