@@ -1,3 +1,13 @@
+import { useAppDispatch } from "../app/hooks"
+import { logout } from "../features/auth/authSlice"
+
 export default function Admin() {
-    return <h1>Admin page!</h1>
+    const dispatch = useAppDispatch()
+
+    return (
+        <>
+            <h1>Admin page!</h1>
+            <button onClick={() => {dispatch(logout())}}>Logout Debug Button</button>
+        </>
+    )
 }

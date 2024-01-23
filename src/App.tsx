@@ -1,5 +1,5 @@
 // import { useState } from 'react'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider, redirect, LoaderFunctionArgs } from 'react-router-dom'
 import { useAppSelector } from './app/hooks'
 import Home from './pages/Home'
 import Login from './pages/Login'
@@ -9,6 +9,16 @@ import './App.css'
 function App() {
   const { isLoggedIn } = useAppSelector((state) => state.auth)
   console.log(isLoggedIn)
+
+  const authCheckLoader = ({ request }: LoaderFunctionArgs) => {
+      // [todo] expiration check
+      if(!isLoggedIn) {
+        let params = new URLSearchParams()
+        params.set("from", new URL(request.url).pathname)
+          return redirect("/login?" + params.toString())
+      }
+      return null
+  }
 
   const router = createBrowserRouter([
     {
@@ -24,8 +34,8 @@ function App() {
     {
       id: "admin",
       path: "admin/",
-      // [todo] check status change situation
-      element: isLoggedIn ? <Admin /> : <Login />,
+      element: <Admin />,
+      loader: authCheckLoader,
     },
   ])
 
