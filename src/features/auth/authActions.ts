@@ -1,8 +1,7 @@
 // Async Request Redux
 import axios from 'axios'
 import { createAsyncThunk } from '@reduxjs/toolkit'
-
-const apiServerURL = import.meta.env.SERVER_URL
+import { APISERVER_URL } from '../../configs/remote';
 
 export interface LoginParamsForm {
     account: string;
@@ -32,7 +31,7 @@ export const userLogin = createAsyncThunk(
             }
 
             const { data } = await axios.post(
-                `${apiServerURL}/auth/login`,
+                `${APISERVER_URL}/auth/login`,
                 { account, password },
                 config
             )
@@ -64,7 +63,7 @@ export const userRegister = createAsyncThunk(
             }
 
             const { data } = await axios.post(
-                `${apiServerURL}/auth/register`,
+                `${APISERVER_URL}/auth/register`,
                 { account, username, password },
                 config
             )
