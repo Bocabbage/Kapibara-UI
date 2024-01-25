@@ -1,14 +1,14 @@
 // import { useState } from 'react'
 import { createBrowserRouter, RouterProvider, redirect, LoaderFunctionArgs } from 'react-router-dom'
 import { useAppSelector } from './app/hooks'
+import { AxiosInterceptor } from './app/services/request/interceptors'
 import Home from './pages/Home'
 import Login from './pages/Login'
 import Admin from './pages/Admin'
 import './App.css'
 
 function App() {
-  const { isLoggedIn } = useAppSelector((state) => state.auth)
-  console.log(isLoggedIn)
+  const { isLoggedIn, accessToken } = useAppSelector((state) => state.auth)
 
   const authCheckLoader = ({ request }: LoaderFunctionArgs) => {
       // [todo] expiration check
@@ -38,6 +38,9 @@ function App() {
       loader: authCheckLoader,
     },
   ])
+
+  // axios interceptor setting
+  AxiosInterceptor(accessToken)
 
   return (
     <RouterProvider router={router} />
