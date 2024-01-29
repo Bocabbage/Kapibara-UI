@@ -2,20 +2,24 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useAppSelector, useAppDispatch } from '../app/hooks'
 import { userLogin, LoginParamsForm } from '../features/auth/authActions'
+import { useNavigate } from 'react-router-dom'
 
 export default function Login() {
     // [todo] use error data
-    const { loading, userInfo, error } = useAppSelector((state) => state.auth)
+    const { isLoggedIn, loading, error } = useAppSelector((state) => state.auth)
+    const navigate = useNavigate()
+
+    // Redirect if logged-in
+    useEffect(() => {
+        if(isLoggedIn) {
+            // [todo] enhancement
+            navigate("/Admin")
+        }
+    }, [isLoggedIn])
+
     const dispatch = useAppDispatch()
     
     const { register, handleSubmit } = useForm()
-
-    useEffect(() => {
-        if(userInfo) {
-            // [todo] navigate to some login-after page
-            // useNavigate
-        }
-    })
 
     const submitForm = (data: any) => {
         let formData = data as LoginParamsForm

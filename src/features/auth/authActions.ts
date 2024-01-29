@@ -1,7 +1,8 @@
 // Async Request Redux
 import axios from 'axios'
+import { sha256 } from 'js-sha256'
 import { createAsyncThunk } from '@reduxjs/toolkit'
-import { APISERVER_URL } from '../../configs/remote';
+import { APISERVER_URL, AUTH_BASE_URL, CLIENT_SALT } from '../../configs/remote'
 
 export interface LoginParamsForm {
     account: string;
@@ -26,13 +27,16 @@ export const userLogin = createAsyncThunk(
 
             const config = {
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'multipart/form-data'
                 },
             }
 
             const { data } = await axios.post(
-                `${APISERVER_URL}/auth/login`,
-                { account, password },
+                `${APISERVER_URL}/${AUTH_BASE_URL}/login`,
+                { 
+                    account: account, 
+                    password: sha256(password + CLIENT_SALT),
+                },
                 config
             )
 
@@ -58,13 +62,17 @@ export const userRegister = createAsyncThunk(
 
             const config = {
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'multipart/form-data',
                 },
             }
 
             const { data } = await axios.post(
-                `${APISERVER_URL}/auth/register`,
-                { account, username, password },
+                `${APISERVER_URL}/${AUTH_BASE_URL}/register`,
+                { 
+                    account: account, 
+                    username: username, 
+                    password: sha256(password + CLIENT_SALT), 
+                },
                 config
             )
 
