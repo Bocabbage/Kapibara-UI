@@ -10,6 +10,7 @@ export default function Admin() {
 
     return (
         <>
+            <title>Kapibara Admin</title>
             <h1>Admin page!</h1>
             <button onClick={() => {dispatch(logout())}}>Logout Debug Button</button>
             <button onClick={authHeatbeatTest}>Auth-requrired Request Debug Button</button>

@@ -40,8 +40,8 @@ export const userLogin = createAsyncThunk(
                 config
             )
 
-            // [todo] add session storage option
-            localStorage.setItem('access_token', data.access_token)
+            // [todo] add localstorage storage option
+            sessionStorage.setItem('access_token', data.access_token)
 
             return data
         } catch (error: any) {

@@ -12,7 +12,7 @@ type AuthState = {
 }
 
 // [todo] add support for sessionStorage
-const accessToken = localStorage.getItem('access_token')
+const accessToken: string | null = null // localStorage.getItem('access_token')
 
 const initialState: AuthState = {
     loading: false,
@@ -28,8 +28,8 @@ const authSlice = createSlice({
     initialState,
     reducers: {
         logout: (state: AuthState) => {
-            // [todo] add sessionStorage support
-            localStorage.removeItem('access_token')
+            // [todo] add localStorage support
+            sessionStorage.removeItem('access_token')
             state.loading = false
             state.userInfo = null
             state.accessToken = null
