@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { useAppSelector, useAppDispatch } from '../app/hooks'
 import { userLogin, LoginParamsForm } from '../features/auth/authActions'
 import { useNavigate } from 'react-router-dom'
+import { Switch } from 'antd'
 
 export default function Login() {
     // [todo] use error data
@@ -80,6 +81,11 @@ export default function Login() {
                     className="form-input block w-full rounded-md border-0 pl-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   />
                 </div>
+              </div>
+
+              <div className="flex flex-row space-x-2 justify-end">
+                <p className="font-oswald-regular">Remember Me</p>
+                <div><Switch className="bg-stone-200" /></div>
               </div>
 
               <button
