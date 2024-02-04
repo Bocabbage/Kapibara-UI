@@ -7,6 +7,7 @@ import { APISERVER_URL, AUTH_BASE_URL, CLIENT_SALT } from '../../configs/remote'
 export interface LoginParamsForm {
     account: string;
     password: string;
+    rememberMe: boolean;
 }
 
 interface RegisterParamsForm {
@@ -23,7 +24,7 @@ export const userLogin = createAsyncThunk(
     // payload creator
     async (params: LoginParamsForm, { rejectWithValue }) => {
         try {
-            const { account, password } = params
+            const { account, password, rememberMe } = params
 
             const config = {
                 headers: {
@@ -36,13 +37,10 @@ export const userLogin = createAsyncThunk(
                 { 
                     account: account, 
                     password: sha256(password + CLIENT_SALT),
+                    rememberMe: rememberMe,
                 },
                 config
             )
-
-            // [todo] add localstorage storage option
-            sessionStorage.setItem('access_token', data.access_token)
-
             return data
         } catch (error: any) {
             if (error.response && error.response.data.message) {

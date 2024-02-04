@@ -28,6 +28,7 @@ export const AxiosInterceptor = (accessToken: string | null) => {
         }
         else {
             // [todo] data enhancement
+            // [todo] check token invalid situation: -> login
             const message = `${res.status}`
             return Promise.reject(Error(message))
         }

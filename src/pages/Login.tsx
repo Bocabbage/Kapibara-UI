@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useAppSelector, useAppDispatch } from '../app/hooks'
 import { userLogin, LoginParamsForm } from '../features/auth/authActions'
@@ -9,6 +9,12 @@ export default function Login() {
     // [todo] use error data
     const { isLoggedIn, loading } = useAppSelector((state) => state.auth)
     const navigate = useNavigate()
+    
+    const [rememberMe, setRememberMe] = useState(false)
+    const changeRememberMe = () => {
+      setRememberMe(!rememberMe);
+    }
+
 
     // Redirect if logged-in
     useEffect(() => {
@@ -24,6 +30,7 @@ export default function Login() {
 
     const submitForm = (data: any) => {
         let formData = data as LoginParamsForm
+        formData.rememberMe = rememberMe
         // dispatch function can accept the thunk object as parameter directly
         dispatch(userLogin(formData))
     }
@@ -85,7 +92,13 @@ export default function Login() {
 
               <div className="flex flex-row space-x-2 justify-end">
                 <p className="font-oswald-regular">Remember Me</p>
-                <div><Switch className="bg-stone-200" /></div>
+                <div>
+                <Switch 
+                    checked={rememberMe} 
+                    onClick={changeRememberMe} 
+                    className="bg-stone-200"
+                />
+                </div>
               </div>
 
               <button

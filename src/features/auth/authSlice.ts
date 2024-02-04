@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { userRegister, userLogin } from './authActions'
+import { getCookie } from '../../utils/cookie'
 
 // Type definitions
 type AuthState = {
@@ -11,16 +12,17 @@ type AuthState = {
     isLoggedIn: boolean,
 }
 
-// [todo] add support for sessionStorage
-const accessToken: string | null = null // localStorage.getItem('access_token')
+// Try to find cache in the cookie
+const accessToken: string | null = getCookie('access_token')
+const userInfo: string | null = getCookie("user_info")
 
 const initialState: AuthState = {
     loading: false,
-    userInfo: null,
+    userInfo: userInfo,
     accessToken,
     error: null,
     success: false,
-    isLoggedIn: false,
+    isLoggedIn: accessToken !== null,
 }
 
 const authSlice = createSlice({
@@ -28,8 +30,7 @@ const authSlice = createSlice({
     initialState,
     reducers: {
         logout: (state: AuthState) => {
-            // [todo] add localStorage support
-            sessionStorage.removeItem('access_token')
+            localStorage.removeItem('access_token')
             state.loading = false
             state.userInfo = null
             state.accessToken = null
@@ -37,7 +38,7 @@ const authSlice = createSlice({
             state.isLoggedIn = false
         },
         setCredentials: (state: AuthState, { payload }) => {
-            state.userInfo = payload
+            state.userInfo = payload.user_info
         }
     },
     extraReducers: (builder) => {
@@ -53,7 +54,7 @@ const authSlice = createSlice({
             .addCase(userLogin.fulfilled, (state: AuthState, { payload }) => {
                 state.loading = false
                 state.error = null
-                state.userInfo = payload
+                state.userInfo = payload.user_info
                 state.accessToken = payload.access_token
                 state.isLoggedIn = true
             })
