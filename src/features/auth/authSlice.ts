@@ -6,23 +6,23 @@ import { getCookie } from '../../utils/cookie'
 type AuthState = {
     loading: boolean,
     userInfo: string | null,
-    accessToken: string | null,
+    // accessToken: string | null,
     error: string | null,
     success: boolean,
     isLoggedIn: boolean,
 }
 
 // Try to find cache in the cookie
-const accessToken: string | null = getCookie('access_token')
-const userInfo: string | null = getCookie("user_info")
+// const accessToken: string | null = getCookie('access_token')
+const userInfo: string | null = getCookie("_kapibara_user_info")
 
 const initialState: AuthState = {
     loading: false,
     userInfo: userInfo,
-    accessToken,
+    // accessToken,
     error: null,
     success: false,
-    isLoggedIn: accessToken !== null,
+    isLoggedIn: userInfo !== null,
 }
 
 const authSlice = createSlice({
@@ -30,10 +30,9 @@ const authSlice = createSlice({
     initialState,
     reducers: {
         logout: (state: AuthState) => {
-            localStorage.removeItem('access_token')
             state.loading = false
             state.userInfo = null
-            state.accessToken = null
+            // state.accessToken = null
             state.error = null
             state.isLoggedIn = false
         },
@@ -55,7 +54,7 @@ const authSlice = createSlice({
                 state.loading = false
                 state.error = null
                 state.userInfo = payload.user_info
-                state.accessToken = payload.access_token
+                // state.accessToken = payload.access_token
                 state.isLoggedIn = true
             })
             .addCase(userLogin.rejected, (state: AuthState, { payload }) => {

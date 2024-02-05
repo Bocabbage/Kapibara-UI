@@ -8,7 +8,7 @@ import Admin from './pages/Admin'
 import './App.css'
 
 function App() {
-  const { isLoggedIn, accessToken } = useAppSelector((state) => state.auth)
+  const { isLoggedIn } = useAppSelector((state) => state.auth)
 
   const authCheckLoader = ({ request }: LoaderFunctionArgs) => {
       // [todo] expiration check
@@ -40,7 +40,7 @@ function App() {
   ])
 
   // axios interceptor setting
-  AxiosInterceptor(accessToken)
+  AxiosInterceptor()
 
   return (
     <RouterProvider router={router} />
