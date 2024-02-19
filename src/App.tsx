@@ -5,6 +5,7 @@ import { AxiosInterceptor } from './app/services/request/interceptors'
 import Home from './pages/Home'
 import Login from './pages/Login'
 import Admin from './pages/Admin'
+import Mikanani from './pages/Mikanani'
 import './App.css'
 
 function App() {
@@ -36,6 +37,13 @@ function App() {
       path: "admin/",
       element: <Admin />,
       loader: authCheckLoader,
+    },
+    {
+      // TODO: Add authcheck & use subpath of admin
+      id: "mikanani",
+      path: "mikanani/",
+      element: <Mikanani />,
+      // loader: authCheckLoader,
     },
   ])
 

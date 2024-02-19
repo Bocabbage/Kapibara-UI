@@ -1,19 +1,20 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useAppSelector, useAppDispatch } from '../app/hooks'
 import { userLogin, LoginParamsForm } from '../features/auth/authActions'
 import { useNavigate } from 'react-router-dom'
-// import { Switch } from 'antd'
+// import { isAllOf } from '@reduxjs/toolkit'
+import { Switch } from 'antd'
 
 export default function Login() {
     // [todo] use error data
     const { isLoggedIn, loading } = useAppSelector((state) => state.auth)
     const navigate = useNavigate()
     
-    // const [rememberMe, setRememberMe] = useState(false)
-    // const changeRememberMe = () => {
-    //   setRememberMe(!rememberMe);
-    // }
+    const [rememberMe, setRememberMe] = useState(false)
+    const changeRememberMe = () => {
+      setRememberMe(!rememberMe);
+    }
 
 
     // Redirect if logged-in
@@ -30,7 +31,7 @@ export default function Login() {
 
     const submitForm = (data: any) => {
         let formData = data as LoginParamsForm
-        // formData.rememberMe = rememberMe
+        formData.rememberMe = rememberMe
         // dispatch function can accept the thunk object as parameter directly
         dispatch(userLogin(formData))
     }
@@ -90,7 +91,7 @@ export default function Login() {
                 </div>
               </div>
 
-              {/* <div className="flex flex-row space-x-2 justify-end">
+              <div className="flex flex-row space-x-2 justify-end">
                 <p className="font-oswald-regular">Remember Me</p>
                 <div>
                 <Switch 
@@ -99,7 +100,7 @@ export default function Login() {
                     className="bg-stone-200"
                 />
                 </div>
-              </div> */}
+              </div>
 
               <button
                 type="submit"

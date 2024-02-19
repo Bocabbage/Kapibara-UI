@@ -7,7 +7,7 @@ import { APISERVER_URL, AUTH_BASE_URL, CLIENT_SALT } from '../../configs/remote'
 export interface LoginParamsForm {
     account: string;
     password: string;
-    // rememberMe: boolean;
+    rememberMe: boolean;
 }
 
 interface RegisterParamsForm {
