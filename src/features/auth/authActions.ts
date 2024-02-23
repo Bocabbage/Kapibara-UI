@@ -30,6 +30,7 @@ export const userLogin = createAsyncThunk(
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 },
+                withCredentials: true
             }
 
             const { data } = await axios.post(
@@ -61,6 +62,7 @@ export const userRegister = createAsyncThunk(
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
+                withCredentials: true
             }
 
             const { data } = await axios.post(
