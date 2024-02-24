@@ -1,8 +1,9 @@
 // Async Request Redux
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { sha256 } from 'js-sha256'
 import { createAsyncThunk } from '@reduxjs/toolkit'
 import { APISERVER_URL, AUTH_BASE_URL, CLIENT_SALT } from '../../configs/remote'
+import { STORE_USER_INFO_KEY } from '../../configs/local'
 
 export interface LoginParamsForm {
     account: string;
@@ -41,17 +42,35 @@ export const userLogin = createAsyncThunk(
                 },
                 config
             )
+
+            params.rememberMe ? localStorage.setItem(STORE_USER_INFO_KEY, data.user_name) : sessionStorage.setItem(STORE_USER_INFO_KEY, data.user_name)
             return data
         } catch (error: any) {
-            if (error.response && error.response.data.message) {
-                return rejectWithValue(error.response.data.message)
-            } else {
+            if (error instanceof AxiosError) {
+                if (error.response && error.response.data.message) {
+                    // Client error
+                    switch(error.response.status) {
+                        case 422: alert("invalid account or password!"); break;
+                        case 500: alert("problems happened on the server!"); break;
+                        default: alert("Unexpected error happened on login."); break;
+                    }
+    
+                    return rejectWithValue(error.response.data.message)
+                } else {
+                    alert("Unexpected empty response happened on login.")
+                    return rejectWithValue(error.message)
+                }
+            }
+            else {
+                // Unexpected error
+                alert("Unexpected not-request-error happened on login.")
                 return rejectWithValue(error.message)
             }
         }
     }
 )
 
+// [todo] impl finish
 export const userRegister = createAsyncThunk(
     'auth/register',
     async (params: RegisterParamsForm, { rejectWithValue }) => {
@@ -84,4 +103,45 @@ export const userRegister = createAsyncThunk(
             }
         }
     }
+)
+
+export const testAuthApi = createAsyncThunk(
+    // action prefix
+   'auth/authtest',
+   // payload creator
+   async (_, { rejectWithValue }) => {
+    try {
+        const { data } = await axios.get(
+            `${APISERVER_URL}/test/v1/echo`, 
+            {
+                withCredentials: true,
+                params: {
+                    message: "hello",
+                },
+            }
+        )
+        console.log(data)
+        alert(`Get data: ${data.msg}`)
+    } catch (error: any) {
+        if (error instanceof AxiosError) {
+            if (error.response && error.response.data.message) {
+                // Client error
+                switch(error.response.status) {
+                    case 401: alert("login expired, please sign in again!"); break;
+                    case 500: alert("problems happened on the server!"); break;
+                    default: alert("Unexpected error happened on login."); break;
+                }
+                return rejectWithValue(error.message)
+            } else {
+                alert("Unexpected empty response happened on login.")
+                return rejectWithValue(error.message)
+            }
+        }
+        else {
+            // Unexpected error
+            alert("Unexpected not-request-error happened on login.")
+            return rejectWithValue(error.message)
+        }
+       }
+   }
 )

@@ -1,28 +1,37 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { userRegister, userLogin } from './authActions'
-import { getCookie } from '../../utils/cookie'
+import { userRegister, userLogin, testAuthApi } from './authActions'
+import { STORE_USER_INFO_KEY } from '../../configs/local'
 
 // Type definitions
 type AuthState = {
     loading: boolean,
-    userInfo: string | null,
+    userName: string | null,
     // accessToken: string | null,
     error: string | null,
     success: boolean,
-    isLoggedIn: boolean,
 }
 
 // Try to find cache in the cookie
 // const accessToken: string | null = getCookie('access_token')
-const userInfo: string | null = getCookie("_kapibara_user_info")
+const userName_local: string | null = localStorage.getItem(STORE_USER_INFO_KEY)
 
 const initialState: AuthState = {
     loading: false,
-    userInfo: userInfo,
+    userName: userName_local ? userName_local : sessionStorage.getItem(STORE_USER_INFO_KEY),
     // accessToken,
     error: null,
     success: false,
-    isLoggedIn: userInfo !== null,
+}
+
+const _logout = (state: AuthState) => {
+    state.loading = false
+    state.userName = null
+    // state.accessToken = null
+    state.error = null
+    state.success = false
+    
+    sessionStorage.removeItem(STORE_USER_INFO_KEY)
+    localStorage.removeItem(STORE_USER_INFO_KEY)
 }
 
 const authSlice = createSlice({
@@ -30,15 +39,11 @@ const authSlice = createSlice({
     initialState,
     reducers: {
         logout: (state: AuthState) => {
-            state.loading = false
-            state.userInfo = null
-            // state.accessToken = null
-            state.error = null
-            state.isLoggedIn = false
+            _logout(state)
         },
-        setCredentials: (state: AuthState, { payload }) => {
-            state.userInfo = payload.user_info
-        }
+        // setCredentials: (state: AuthState, { payload }) => {
+        //     state.userInfo = payload.user_info
+        // }
     },
     extraReducers: (builder) => {
         builder
@@ -47,19 +52,17 @@ const authSlice = createSlice({
             // so add reducers to process: builder.addCase(action, reducer)
             .addCase(userLogin.pending, (state: AuthState) => {
                 state.loading = true
-                state.isLoggedIn = false
                 state.error = null
             })
             .addCase(userLogin.fulfilled, (state: AuthState, { payload }) => {
                 state.loading = false
                 state.error = null
-                state.userInfo = payload.user_info
+                state.userName = payload.user_name
+                state.success = true
                 // state.accessToken = payload.access_token
-                state.isLoggedIn = true
             })
             .addCase(userLogin.rejected, (state: AuthState, { payload }) => {
                 let errorMsg = payload as string
-                state.isLoggedIn = false
                 state.loading = false
                 state.error = errorMsg
             })
@@ -78,9 +81,12 @@ const authSlice = createSlice({
                 state.loading = false
                 state.error = errorMsg
             })
+            .addCase(testAuthApi.rejected, (state: AuthState) => {
+                _logout(state)
+            })
     },
         
 })
 
-export const { logout, setCredentials } = authSlice.actions
+export const { logout } = authSlice.actions
 export default authSlice.reducer

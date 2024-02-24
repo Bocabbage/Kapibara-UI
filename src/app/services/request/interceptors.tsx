@@ -10,40 +10,25 @@ export const AxiosInterceptor = () => {
     axios.defaults.timeout = REMOTE_TIMEOUT
     axios.defaults.baseURL = APISERVER_URL
 
-    // axios.interceptors.request.use(
-    //     (config) => {
-    //         if(config.baseURL !== AUTH_BASE_URL) {
-    //             if(accessToken !== null) {
-    //                 (config.headers as AxiosHeaders).set(
-    //                     'Authorization',
-    //                     AUTH_TOKEN_TYPE + accessToken
-    //                 )
-    //             }
-    //         }
-    //         return config
-    //     }, error => {
-    //         // [todo] test valid
-    //         return Promise.reject(error)
-    //     }
-    // )
-
-    axios.interceptors.response.use(res => {
-        if(res.status === 200) {
-            return Promise.resolve(res)
-        }
-        else if(res.status == 401) {
-            const dispatch = useAppDispatch()
-            // unauthorized, if the page is log-required, 
-            // the state change and re-render --> login page
-            dispatch(logout())
-            // [todo] check if resolve or reject?
-            return Promise.resolve(res)
+    axios.interceptors.response.use(
+    res => {
+        return res
+    }, 
+    error => {
+        if(error.response) {
+            if(error.response.status === 401) {
+                const dispatch = useAppDispatch()
+                // unauthorized, if the page is log-required, 
+                // the state change and re-render --> login page
+                alert("Login status expired. Please sign in again.")
+                dispatch(logout())
+                // [todo] check if resolve or reject?
+                return Promise.reject(error)
+            }
         }
         else {
-            const message = `${res.status}`
-            return Promise.reject(Error(message))
+            // console.error(`No response error: ${error}`)
+            return Promise.reject(error)
         }
-    }, error => {
-        return Promise.reject(error)
     })
 }

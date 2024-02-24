@@ -8,7 +8,7 @@ import { Switch } from 'antd'
 
 export default function Login() {
     // [todo] use error data
-    const { isLoggedIn, loading } = useAppSelector((state) => state.auth)
+    const { userName, loading } = useAppSelector((state) => state.auth)
     const navigate = useNavigate()
     
     const [rememberMe, setRememberMe] = useState(false)
@@ -19,11 +19,11 @@ export default function Login() {
 
     // Redirect if logged-in
     useEffect(() => {
-        if(isLoggedIn) {
+        if(userName !== null) {
             // [todo] enhancement
             navigate("/Admin")
         }
-    }, [isLoggedIn])
+    }, [userName])
 
     const dispatch = useAppDispatch()
     
