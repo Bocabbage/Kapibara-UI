@@ -1,4 +1,4 @@
-const APISERVER_URL = 'https://kapibara.local.com'// [todo] get config from env: import.meta.env.VITE_SERVER_URL
+const APISERVER_URL = 'https://api.kapibara.local.com:30009'// [todo] get config from env: import.meta.env.VITE_SERVER_URL
 const REMOTE_TIMEOUT = 30000      // ms
 const AUTH_BASE_URL = 'auth/v1'
 const AUTH_TOKEN_TYPE = 'Bearer '
