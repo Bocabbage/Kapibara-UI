@@ -1,6 +1,7 @@
 import { useAppDispatch } from "../app/hooks"
 import { testAuthApi } from '../features/auth/authActions'
 import { logout } from "../features/auth/authSlice"
+import { Button } from "../components/Button"
 
 export default function Admin() {
     const dispatch = useAppDispatch()
@@ -8,9 +9,23 @@ export default function Admin() {
     return (
         <>
             <title>Kapibara Admin</title>
-            <h1>Admin page!</h1>
-            <button className="outline outline-3 outline-orange-200 login-button flex w-full justify-center rounded-md bg-orange-300 px-3 py-1.5 text-sm font-oswald-bold leading-6 text-white shadow-sm hover:bg-orange-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" onClick={() => {dispatch(logout())}}>Logout Debug Button</button>
-            <button className="outline outline-3 outline-orange-200 login-button flex w-full justify-center rounded-md bg-orange-300 px-3 py-1.5 text-sm font-oswald-bold leading-6 text-white shadow-sm hover:bg-orange-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" onClick={() => dispatch(testAuthApi())}>Auth-requrired Request Debug Button</button>
+            <div className="w-full h-full flex flex-col bg-stone-50">
+							<div className="basis-1/8 grid grid-cols-12 bg-zinc-300">
+								<div className="
+									login-button
+									grid col-span-1 col-start-11 basis-1/8" 
+								>
+									<Button text="Logout" onClick={() => {dispatch(logout())}} />
+								</div>
+
+								<div className="
+									echotest-button
+									grid col-span-1 col-start-12 basis-1/8"
+								>
+									<Button text="Echotest" onClick={() => dispatch(testAuthApi())} />
+								</div>
+            	</div>
+            </div>
         </>
     )
 }

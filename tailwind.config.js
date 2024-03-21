@@ -9,6 +9,9 @@ export default {
       'oswald-bold': ['Oswald-Bold', 'sans-serif'],
       'oswald-regular': ['Oswald-Regular', 'sans-serif'],
     },
+    // colors: {
+    //   'tutti-frutti-g': '#9dbdba'
+    // },
     extend: {},
   },
   plugins: [],
