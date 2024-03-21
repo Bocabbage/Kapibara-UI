@@ -2,30 +2,89 @@ import { useAppDispatch } from "../app/hooks"
 import { testAuthApi } from '../features/auth/authActions'
 import { logout } from "../features/auth/authSlice"
 import { Button } from "../components/Button"
+import { Menu, MenuProps, ConfigProvider } from "antd"
+import { StarOutlined, CoffeeOutlined } from "@ant-design/icons"
+import { useEffect, useState } from 'react'
+import { Outlet, NavLink, useLocation } from "react-router-dom"
+
+type MenuItem = Required<MenuProps>['items'][number]
 
 export default function Admin() {
     const dispatch = useAppDispatch()
+		const location = useLocation()
+		const [currMenuKey, setCurrMenuKey] = useState("mikanani")
+
+		useEffect(() => {
+			let pathname = location.pathname
+			pathname = pathname.endsWith('/') ? pathname.slice(0, -1) : pathname
+			let pathnamesegs = pathname.split('/')
+			let key = pathnamesegs[pathnamesegs.length - 1]
+			setCurrMenuKey(key)
+		}, [location])
+
+		const menuItems: MenuItem[] = [
+			{
+				label: <NavLink to={"mikanani/"}>Mikanani</NavLink>, 
+				key: "mikanani", 
+				icon: <StarOutlined />
+			},
+			{
+				label: <NavLink to={"beans/"}>Beans</NavLink>, 
+				key: "beans", 
+				icon: <CoffeeOutlined />
+			},
+		]
 
     return (
         <>
+						<ConfigProvider
+							theme={{
+								components: {
+									Menu: {
+										itemSelectedBg: "#d4d4d8",
+										itemSelectedColor: "#0"
+									},
+								}
+							}}
+						>
             <title>Kapibara Admin</title>
             <div className="w-full h-full flex flex-col bg-stone-50">
-							<div className="basis-1/8 grid grid-cols-12 bg-zinc-300">
-								<div className="
-									login-button
-									grid col-span-1 col-start-11 basis-1/8" 
-								>
-									<Button text="Logout" onClick={() => {dispatch(logout())}} />
-								</div>
-
+							{/* Header */}
+							<div className="basis-1/8 grid grid-cols-11 bg-zinc-300">
 								<div className="
 									echotest-button
-									grid col-span-1 col-start-12 basis-1/8"
+									grid col-span-1 col-start-11 basis-1/8"
 								>
 									<Button text="Echotest" onClick={() => dispatch(testAuthApi())} />
 								</div>
+
+								<div className="
+									login-button
+									grid col-span-1 col-start-12 basis-1/8" 
+								>
+									<Button text="Logout" onClick={() => {dispatch(logout())}} />
+								</div>
             	</div>
+							{/* Body */}
+							<div className="basis-7/8 grid grid-cols-4 h-full">
+								<div className="grid col-span-1 w-full h-full">
+									<Menu 
+										items={menuItems} 
+										defaultSelectedKeys={["/mikanani"]}
+										selectedKeys={[currMenuKey]}
+										onClick={({key}) => setCurrMenuKey(key)}
+									/>
+								</div>
+
+								<div className="grid col-span-3 w-full h-full">
+									{/* child-page render based on the url */}
+									<p>currMenuKey: {currMenuKey}</p>
+									<Outlet />
+								</div>
+
+							</div>
             </div>
+						</ConfigProvider>
         </>
     )
 }

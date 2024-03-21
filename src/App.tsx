@@ -6,6 +6,7 @@ import Home from './pages/Home'
 import Login from './pages/Login'
 import Admin from './pages/Admin'
 import Mikanani from './pages/Mikanani'
+import CoffeeBeans from './pages/CoffeeBeans'
 import './App.css'
 
 function App() {
@@ -36,15 +37,25 @@ function App() {
       id: "admin",
       path: "admin/",
       element: <Admin />,
-      loader: authCheckLoader,
+      children: [
+        {
+          path: "mikanani",
+          element: <Mikanani />
+        },
+        {
+          path: "beans",
+          element: <CoffeeBeans />
+        }
+      ],
+      // loader: authCheckLoader,
     },
-    {
-      // TODO: Add authcheck & use subpath of admin
-      id: "mikanani",
-      path: "mikanani/",
-      element: <Mikanani />,
-      loader: authCheckLoader,
-    },
+    // {
+    //   // TODO: Add authcheck & use subpath of admin
+    //   id: "mikanani",
+    //   path: "mikanani/",
+    //   element: <Mikanani />,
+    //   // loader: authCheckLoader,
+    // },
   ])
 
   // axios interceptor setting
