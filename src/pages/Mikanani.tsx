@@ -1,16 +1,13 @@
-import { Layout, Menu, Tag, ConfigProvider } from 'antd'
-import { CheckCircleOutlined, MinusCircleOutlined } from '@ant-design/icons'
-import React from 'react';
-
-const MenuName: string[] = ["AnimeList"]
-const MenuItem = new Array(1).fill(null).map((_, index) => ({
-  key: index + 1,
-  label: `${MenuName[index]}`
-}))
+import { Card, Col, Row, ConfigProvider } from 'antd'
+// import { CheckCircleOutlined, MinusCircleOutlined } from '@ant-design/icons'
+// import { AnimeCard } from '../components/mikanani/AnimeCard';
+// import React from 'react';
+const { Meta } = Card;
 
 type AnimeInfo = {
   name: string,
   isActive: boolean,
+  animeUrl: string,
 }
 
 
@@ -19,13 +16,21 @@ const animeList: Array<AnimeInfo> = [
   {
     name: "AnimeName1",
     isActive: true,
+    animeUrl: "/kapibara-maru.png"
   },
   {
     name: "AnimeName2",
+    animeUrl: "https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png",
     isActive: false,
   },
   {
     name: "AnimeName3",
+    animeUrl: "https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png",
+    isActive: true,
+  },
+  {
+    name: "AnimeName4",
+    animeUrl: "https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png",
     isActive: true,
   },
 ]
@@ -38,7 +43,30 @@ export default function Mikanani() {
         return a.isActive ? -1: 1;
     })
 
-    return <>
+    const cardItems = animeList.map(anime => 
+      <Col span={6} key={anime.name}>
+      <Card 
+        style={{ margin: "6px", maxHeight: "" }}
+        cover={
+          <img
+            alt="example"
+            className="w-max h-max"
+            src={anime.animeUrl}
+          />
+        }
+        hoverable
+      >
+        <Meta
+          title={anime.name}
+          description={"is-active: " + anime.isActive}
+        />
+      </Card>
+      </Col>
+    )
 
+    return <>
+      <Row gutter={24}>
+        {cardItems}
+      </Row>
     </>
 }

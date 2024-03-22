@@ -1,7 +1,7 @@
 import { useAppDispatch } from "../app/hooks"
 import { testAuthApi } from '../features/auth/authActions'
 import { logout } from "../features/auth/authSlice"
-import { Button } from "../components/Button"
+import { Button } from "../components/common/Button"
 import { Menu, MenuProps, ConfigProvider } from "antd"
 import { StarOutlined, CoffeeOutlined } from "@ant-design/icons"
 import { useEffect, useState } from 'react'
@@ -45,7 +45,7 @@ export default function Admin() {
 								components: {
 									Menu: {
 										itemSelectedBg: "#52525b",
-										itemSelectedColor: "#000000",
+										itemSelectedColor: "#ffffff",
 										itemBorderRadius: 4,
 										itemMarginInline:8,
 									},
@@ -71,8 +71,8 @@ export default function Admin() {
 								</div>
             	</div>
 							{/* Body */}
-							<div className="basis-7/8 grid grid-cols-8 h-full">
-								<div className="grid col-span-1 w-full h-full">
+							<div className="basis-7/8 grid grid-cols-12 h-full">
+								<div className="grid col-span-2 w-full h-full">
 									<Menu 
 										items={menuItems} 
 										defaultSelectedKeys={[]}
@@ -81,7 +81,7 @@ export default function Admin() {
 									/>
 								</div>
 
-								<div className="grid col-span-7 w-full h-full">
+								<div className="grid col-span-10 w-full h-full">
 									{/* child-page render based on the url */}
 									<Outlet />
 								</div>
