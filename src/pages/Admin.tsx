@@ -5,13 +5,14 @@ import { Button } from "../components/Button"
 import { Menu, MenuProps, ConfigProvider } from "antd"
 import { StarOutlined, CoffeeOutlined } from "@ant-design/icons"
 import { useEffect, useState } from 'react'
-import { Outlet, NavLink, useLocation } from "react-router-dom"
+import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom"
 
 type MenuItem = Required<MenuProps>['items'][number]
 
 export default function Admin() {
     const dispatch = useAppDispatch()
 		const location = useLocation()
+		const navigate = useNavigate()
 		const [currMenuKey, setCurrMenuKey] = useState("mikanani")
 
 		useEffect(() => {
@@ -19,6 +20,8 @@ export default function Admin() {
 			pathname = pathname.endsWith('/') ? pathname.slice(0, -1) : pathname
 			let pathnamesegs = pathname.split('/')
 			let key = pathnamesegs[pathnamesegs.length - 1]
+			if(key.toLowerCase() === 'admin')
+				navigate("admin/mikanani")
 			setCurrMenuKey(key)
 		}, [location])
 
@@ -41,8 +44,10 @@ export default function Admin() {
 							theme={{
 								components: {
 									Menu: {
-										itemSelectedBg: "#d4d4d8",
-										itemSelectedColor: "#0"
+										itemSelectedBg: "#52525b",
+										itemSelectedColor: "#000000",
+										itemBorderRadius: 4,
+										itemMarginInline:8,
 									},
 								}
 							}}
@@ -50,7 +55,7 @@ export default function Admin() {
             <title>Kapibara Admin</title>
             <div className="w-full h-full flex flex-col bg-stone-50">
 							{/* Header */}
-							<div className="basis-1/8 grid grid-cols-11 bg-zinc-300">
+							<div className="basic-1/8 grid grid-cols-12 bg-zinc-300">
 								<div className="
 									echotest-button
 									grid col-span-1 col-start-11 basis-1/8"
@@ -66,19 +71,18 @@ export default function Admin() {
 								</div>
             	</div>
 							{/* Body */}
-							<div className="basis-7/8 grid grid-cols-4 h-full">
+							<div className="basis-7/8 grid grid-cols-8 h-full">
 								<div className="grid col-span-1 w-full h-full">
 									<Menu 
 										items={menuItems} 
-										defaultSelectedKeys={["/mikanani"]}
+										defaultSelectedKeys={[]}
 										selectedKeys={[currMenuKey]}
 										onClick={({key}) => setCurrMenuKey(key)}
 									/>
 								</div>
 
-								<div className="grid col-span-3 w-full h-full">
+								<div className="grid col-span-7 w-full h-full">
 									{/* child-page render based on the url */}
-									<p>currMenuKey: {currMenuKey}</p>
 									<Outlet />
 								</div>
 

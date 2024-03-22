@@ -47,15 +47,8 @@ function App() {
           element: <CoffeeBeans />
         }
       ],
-      // loader: authCheckLoader,
+      loader: authCheckLoader,
     },
-    // {
-    //   // TODO: Add authcheck & use subpath of admin
-    //   id: "mikanani",
-    //   path: "mikanani/",
-    //   element: <Mikanani />,
-    //   // loader: authCheckLoader,
-    // },
   ])
 
   // axios interceptor setting
