@@ -42,6 +42,9 @@ export default function Admin() {
         <>
 						<ConfigProvider
 							theme={{
+                token: {
+                  
+                },
 								components: {
 									Menu: {
 										itemSelectedBg: "#52525b",
@@ -49,6 +52,9 @@ export default function Admin() {
 										itemBorderRadius: 4,
 										itemMarginInline:8,
 									},
+                  Switch: {
+                    // handleBg: "#e7e5e4"
+                  }
 								}
 							}}
 						>
