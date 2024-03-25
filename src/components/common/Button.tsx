@@ -5,7 +5,7 @@ interface ButtonProps {
 	onClick: () => void
 }
 
-export const Button: React.FC<ButtonProps> = ({text, onClick}) => {
+export const KButton: React.FC<ButtonProps> = ({text, onClick}) => {
     return <>
 			<button className="
 				m-2 

@@ -3,7 +3,7 @@ import { getAnimeList, InsertAnimeItem } from '../apis/remote';
 import { useAppDispatch } from '../app/hooks';
 import { useEffect, useState } from 'react';
 import { logout } from "../features/auth/authSlice"
-import { CheckCircleOutlined, MinusCircleOutlined, FileAddOutlined } from '@ant-design/icons'
+import { CheckCircleOutlined, MinusCircleOutlined, FileAddOutlined, DeleteOutlined } from '@ant-design/icons'
 // import { AnimeCard } from '../components/mikanani/AnimeCard';
 // import React from 'react';
 const { Meta } = Card;
@@ -19,6 +19,7 @@ export default function Mikanani() {
     const [animeList, setAnimeList] = useState(Array<AnimeInfo>)
     const [addAnimeModalOpen, setAddAnimeModalOpen] = useState(false)
     const [addAnimeLoading, setAddAnimeLoading] = useState(false)
+    const [isManageMode, setIsManageMode] = useState(false)
     const [addAnimeForm] = Form.useForm()
     const dispatch = useAppDispatch()
 
@@ -56,6 +57,20 @@ export default function Mikanani() {
           case 401: alert("login expired, please sign in again!"); dispatch(logout()); break;
         }
       })
+
+      // mock-data:
+      // setAnimeList([
+      //   {
+      //     name: "AnimeName1",
+      //     isActive: true,
+      //     animeUrl: "/kapibara-maru.png"
+      //   },
+      //   {
+      //     name: "AnimeName2",
+      //     animeUrl: "https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png",
+      //     isActive: false,
+      //   }
+      // ])
     }, [])
 
     // TODO: [Enhancement] All config together
@@ -74,6 +89,10 @@ export default function Mikanani() {
             className="h-72 w-72 blur-sm hover:blur-none"
             src={anime.animeUrl}
           />
+        }
+        actions={
+          // TODO: add delete logic
+          isManageMode? [<DeleteOutlined onClick={() => alert("hello!")}/>] : []
         }
         hoverable
       >
@@ -102,9 +121,23 @@ export default function Mikanani() {
     ]
 
     return <>
-      <div className="grid grid-rows-4 grid-cols-4">
-        {cardItems}
+      <div className="w-full h-full flex flex-col bg-stone-50">
+        {/* Header */}
+        <div className="basic-1/8 grid grid-cols-12 bg-stone-50">
+          <div className="
+            login-button
+            grid col-span-1 col-start-12 basis-1/8" 
+          >
+            <Button key="modify" style={{margin: "4px"}} onClick={() => setIsManageMode(!isManageMode)}>Manage</Button>
+          </div>
+        </div>
+        {/* Body */}
+        <div className="grid grid-rows-4 grid-cols-4">
+          {cardItems}
+        </div>
       </div>
+
+      {/* Add new anime modal */}
       <Modal 
         title="Add new anime"
         open={addAnimeModalOpen}

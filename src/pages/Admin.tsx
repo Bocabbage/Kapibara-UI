@@ -1,7 +1,7 @@
 import { useAppDispatch } from "../app/hooks"
 import { testAuthApi } from '../features/auth/authActions'
 import { logout } from "../features/auth/authSlice"
-import { Button } from "../components/common/Button"
+import { KButton } from "../components/common/Button"
 import { Menu, MenuProps, ConfigProvider } from "antd"
 import { StarOutlined, CoffeeOutlined } from "@ant-design/icons"
 import { useEffect, useState } from 'react'
@@ -66,14 +66,14 @@ export default function Admin() {
 									echotest-button
 									grid col-span-1 col-start-11 basis-1/8"
 								>
-									<Button text="Echotest" onClick={() => dispatch(testAuthApi())} />
+									<KButton text="Echotest" onClick={() => dispatch(testAuthApi())} />
 								</div>
 
 								<div className="
 									login-button
 									grid col-span-1 col-start-12 basis-1/8" 
 								>
-									<Button text="Logout" onClick={() => {dispatch(logout())}} />
+									<KButton text="Logout" onClick={() => {dispatch(logout())}} />
 								</div>
             	</div>
 							{/* Body */}
