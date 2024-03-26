@@ -24,7 +24,7 @@ const getAnimeList = async (start: number, end: number, status_filter: number) =
     return data.metas
 }
 
-const InsertAnimeItem = async (name: string, rss_url: string, rule: string, regex: string, isActive: boolean) => {
+const insertAnimeItem = async (name: string, rss_url: string, rule: string, regex: string, isActive: boolean) => {
     const { status } = await axios.post(
         `${APISERVER_URL}/mikanani/v2/anime/insert`,
         {
@@ -46,7 +46,23 @@ const InsertAnimeItem = async (name: string, rss_url: string, rule: string, rege
     return status
 }
 
+const deleteAnimeItem = async (uid: string) => {
+    const { status } = await axios.delete(
+        `${APISERVER_URL}/mikanani/v2/anime/delete?uid=${uid}`,
+        {
+            withCredentials: true,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }
+    )
+    // for debug
+    // console.log(data.metas)
+    return status
+}
+
 export {  
     getAnimeList,
-    InsertAnimeItem
+    insertAnimeItem,
+    deleteAnimeItem,
 }
