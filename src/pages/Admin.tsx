@@ -32,7 +32,7 @@ export default function Admin() {
 				icon: <StarOutlined />
 			},
 			{
-				label: <NavLink to={"beans/"}>Beans</NavLink>, 
+				label: <NavLink to={"news/"}>News</NavLink>, 
 				key: "beans", 
 				icon: <CoffeeOutlined />
 			},
@@ -62,12 +62,12 @@ export default function Admin() {
             <div className="w-full h-full flex flex-col bg-stone-50">
 							{/* Header */}
 							<div className="basic-1/8 grid grid-cols-12 bg-zinc-300">
-								<div className="
+								{/* <div className="
 									echotest-button
 									grid col-span-1 col-start-11 basis-1/8"
 								>
 									<KButton text="Echotest" onClick={() => dispatch(testAuthApi())} />
-								</div>
+								</div> */}
 
 								<div className="
 									login-button

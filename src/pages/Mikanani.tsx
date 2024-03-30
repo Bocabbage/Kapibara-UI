@@ -1,5 +1,5 @@
 import { Card, Tag, Modal, Form, Switch, Input, Button } from 'antd'
-import { getAnimeList, insertAnimeItem, deleteAnimeItem } from '../apis/remote';
+import { getAnimeList, getAnimeDoc, insertAnimeItem, deleteAnimeItem, updateAnimeItem } from '../apis/remote';
 import { useAppDispatch } from '../app/hooks';
 import { useEffect, useState, useRef } from 'react';
 import { logout } from "../features/auth/authSlice"
@@ -13,22 +13,42 @@ type AnimeInfo = {
   name: string,
   isActive: boolean,
   animeUrl: string,
+  regex?: string,
+  rule?: string,
+  rssUrl?: string,
 }
 
 
 export default function Mikanani() {
     const [animeList, setAnimeList] = useState(Array<AnimeInfo>)
+
+    // Modal-open state
     const [addAnimeModalOpen, setAddAnimeModalOpen] = useState(false)
     const [delAnimeModalOpen, setDelAnimeModalOpen] = useState(false)
+    const [checkAnimeModalOpen, setCheckAnimeModalOpen] = useState(false)
+
+    // Request loading state
     const [addAnimeLoading, setAddAnimeLoading] = useState(false)
     const [delAnimeLoading, setDelAnimeLoading] = useState(false)
+    const [checkAnimeLoading, setCheckAnimeLoading] = useState(false)
+
+    // Delete mode state
     const [isManageMode, setIsManageMode] = useState(false)
     const toDeleteIds = useRef<string[]>([])
+
+    // Modify doc state
+    const [modAnimeMode, setModAnimeMode] = useState(false)
+    const [checkAnimeInfo, setCheckAnimeInfo] = useState<AnimeInfo>()
+
+    // post-form
     const [addAnimeForm] = Form.useForm()
+    const [modAnimeForm] = Form.useForm()
     const dispatch = useAppDispatch()
 
     const showAddAnimeModal = () => setAddAnimeModalOpen(true)
     const showDelAnimeModal = () => setDelAnimeModalOpen(true)
+    const showCheckAnimeModal = () => setCheckAnimeModalOpen(true)
+    
     const handleAddAnimeCancel = () => setAddAnimeModalOpen(false)
     const handleAddAnimeOk = () => {
       setAddAnimeLoading(true)
@@ -62,7 +82,6 @@ export default function Mikanani() {
     const handleDelAnimeOk = () => {
       setDelAnimeLoading(true)
       for(const toDelId of toDeleteIds.current) {
-        console.log(`come into handle, todelid: ${toDelId}`)
         deleteAnimeItem(toDelId)
         .then(() => {
           alert("Delete anime success!")
@@ -79,8 +98,30 @@ export default function Mikanani() {
       setDelAnimeModalOpen(false)
     }
 
+    const handleCheckAnimeCancel = () => {
+      setModAnimeMode(false)
+      setCheckAnimeModalOpen(false)
+    }
+    const handleModAnimeOk = () => {
+      setCheckAnimeLoading(true)
+      const {name, isActive, regex, rule, rssUrl} = modAnimeForm.getFieldsValue()
+      const uid = checkAnimeInfo?.uid ?? BigInt(0)
+      updateAnimeItem(uid, name, isActive, regex, rssUrl, rule)
+      .then(() => {
+        alert(`Update anime: ${name} config success!`)
+        window.location.reload()
+      })
+      .catch(error => {
+        switch(error.response.status) {
+          case 401: alert("login expired, please sign in again!"); dispatch(logout()); break;
+        }
+      })
+      setCheckAnimeLoading(false)
+      setCheckAnimeModalOpen(false)
+    }
+
     useEffect(() => {
-      getAnimeList(1, 10, 1)
+      getAnimeList(BigInt(1), BigInt(10), BigInt(1))
       .then(metas => {
         setAnimeList(metas.map(meta => {
           return {
@@ -96,23 +137,9 @@ export default function Mikanani() {
           case 401: alert("login expired, please sign in again!"); dispatch(logout()); break;
         }
       })
-
-      // mock-data:
-      // setAnimeList([
-      //   {
-      //     name: "AnimeName1",
-      //     isActive: true,
-      //     animeUrl: "/kapibara-maru.png"
-      //   },
-      //   {
-      //     name: "AnimeName2",
-      //     animeUrl: "https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png",
-      //     isActive: false,
-      //   }
-      // ])
     }, [])
 
-    // TODO: [Enhancement] All config together
+
     animeList.sort((a, b) => {
         if(a.isActive == b.isActive){ return 0; }
         return a.isActive ? -1: 1;
@@ -139,6 +166,29 @@ export default function Mikanani() {
             showDelAnimeModal()
           }}/>] : []
         }
+        onClick={ () => {
+          let currAnimeInfo: AnimeInfo = {
+            uid: anime.uid,
+            name: anime.name,
+            isActive: anime.isActive,
+            animeUrl: anime.animeUrl,
+          }
+          // console.log(`currAnimeInfo: ${currAnimeInfo.name}`)
+          getAnimeDoc(anime.uid)
+          .then(doc => {
+            currAnimeInfo.regex = doc.regex,
+            currAnimeInfo.rule = doc.rule,
+            currAnimeInfo.rssUrl = doc.rssUrl
+            setCheckAnimeInfo(currAnimeInfo)
+            modAnimeForm.setFieldsValue(currAnimeInfo)
+            showCheckAnimeModal()
+          })
+          .catch(error => {
+            switch(error.response.status) {
+              case 401: alert("login expired, please sign in again!"); dispatch(logout()); break;
+            }
+          })
+        }}
         hoverable
       >
         <Meta
@@ -189,8 +239,8 @@ export default function Mikanani() {
         onOk={handleAddAnimeOk}
         onCancel={handleAddAnimeCancel}
         footer={[
-          <Button key="cancel" onClick={handleAddAnimeCancel}>Cancel</Button>,
-          <Button loading={addAnimeLoading} key="submit" htmlType="submit" onClick={handleAddAnimeOk}>Submit</Button>
+          <Button key="add-cancel" onClick={handleAddAnimeCancel}>Cancel</Button>,
+          <Button loading={addAnimeLoading} key="add-submit" htmlType="submit" onClick={handleAddAnimeOk}>Submit</Button>
         ]}
       >
         <Form
@@ -200,16 +250,16 @@ export default function Mikanani() {
           wrapperCol={{span: 16}}
         >
           <Form.Item required label="name" name="name">
-            <Input />
+            <Input maxLength={100} />
           </Form.Item>
           <Form.Item required label="rule" name="rule">
-            <Input />
+            <Input maxLength={100} />
           </Form.Item>
           <Form.Item required label="regex" name="regex">
-            <Input />
+            <Input maxLength={100} />
           </Form.Item>
           <Form.Item required label="rss-url" name="rss_url">
-            <Input />
+            <Input maxLength={100} />
           </Form.Item>
           <Form.Item label="active" name="isActive" initialValue={true} valuePropName="checked">
             <Switch defaultChecked className="bg-stone-200" />
@@ -222,11 +272,49 @@ export default function Mikanani() {
         title="Delete anime"
         open={delAnimeModalOpen}
         footer={[
-          <Button key="cancel" onClick={handleDelAnimeCancel}>No</Button>,
-          <Button loading={delAnimeLoading} key="submit" htmlType="submit" onClick={handleDelAnimeOk}>Yes</Button>
+          <Button key="del-cancel" onClick={handleDelAnimeCancel}>No</Button>,
+          <Button loading={delAnimeLoading} key="del-submit" htmlType="submit" onClick={handleDelAnimeOk}>Yes</Button>
         ]}
       >
         You sure to delete the anime item(s) ?
+      </Modal>
+
+      {/* Anime doc-check + Modify */}
+      <Modal
+        title="Anime details"
+        key={checkAnimeInfo?.uid}
+        open={checkAnimeModalOpen}
+        onOk={handleModAnimeOk}
+        onCancel={handleCheckAnimeCancel}
+        footer={[
+          <Button key="mod-cancel" onClick={handleCheckAnimeCancel}>Cancel</Button>,
+          <Button key="mod-modify" onClick={() => setModAnimeMode(!modAnimeMode)}>Modify</Button>,
+          modAnimeMode ? <Button loading={checkAnimeLoading} key="mod-submit" htmlType="submit" onClick={handleModAnimeOk}>Submit</Button> : null,
+        ]}
+      >
+        <Form
+          form={modAnimeForm}
+          labelAlign="left"
+          labelCol={{span: 4}}
+          wrapperCol={{span: 16}}
+          disabled={!modAnimeMode}
+        >
+          <Form.Item required label="name" name="name">
+            <Input maxLength={100} />
+          </Form.Item>
+          <Form.Item required label="rule" name="rule">
+            <Input maxLength={100} />
+          </Form.Item>
+          <Form.Item required label="regex" name="regex">
+            <Input maxLength={100} />
+          </Form.Item>
+          <Form.Item required label="rss-url" name="rssUrl">
+            <Input maxLength={100} />
+          </Form.Item>
+          <Form.Item label="active" name="isActive" valuePropName="checked">
+            <Switch disabled={!modAnimeMode} defaultChecked={checkAnimeInfo?.isActive}  className="bg-stone-200" />
+          </Form.Item>
+        </Form>
       </Modal>
     </>
 }

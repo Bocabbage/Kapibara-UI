@@ -6,7 +6,7 @@ import Home from './pages/Home'
 import Login from './pages/Login'
 import Admin from './pages/Admin'
 import Mikanani from './pages/Mikanani'
-import CoffeeBeans from './pages/CoffeeBeans'
+import News from './pages/News'
 import './App.css'
 
 function App() {
@@ -43,8 +43,8 @@ function App() {
           element: <Mikanani />
         },
         {
-          path: "beans",
-          element: <CoffeeBeans />
+          path: "news",
+          element: <News />
         }
       ],
       loader: authCheckLoader,
