@@ -53,12 +53,12 @@ export default function Mikanani() {
     const handleAddAnimeOk = () => {
       setAddAnimeLoading(true)
       const {name, rss_url, regex, isActive, rule} = addAnimeForm.getFieldsValue()
-      try {
-        const formatRegex = new RegExp(regex)
-      } catch (error) {
-        alert("Add failed: Invalid regex!")
-        window.location.reload()
-      }
+      // try {
+      //   const formatRegex = new RegExp(regex)
+      // } catch (error) {
+      //   alert(`Add failed: Invalid regex!`)
+      //   window.location.reload()
+      // }
 
       insertAnimeItem(name, rss_url, rule, regex, isActive)
       .then(() => {

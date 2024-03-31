@@ -1,5 +1,4 @@
 import { useAppDispatch } from "../app/hooks"
-import { testAuthApi } from '../features/auth/authActions'
 import { logout } from "../features/auth/authSlice"
 import { KButton } from "../components/common/Button"
 import { Menu, MenuProps, ConfigProvider } from "antd"
@@ -21,7 +20,7 @@ export default function Admin() {
 			let pathnamesegs = pathname.split('/')
 			let key = pathnamesegs[pathnamesegs.length - 1]
 			if(key.toLowerCase() === 'admin')
-				navigate("admin/mikanani")
+				navigate("mikanani")
 			setCurrMenuKey(key)
 		}, [location])
 
