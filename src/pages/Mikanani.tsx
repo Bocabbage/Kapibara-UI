@@ -1,15 +1,16 @@
 import { Card, Tag, Modal, Form, Switch, Input, Button } from 'antd'
-import { getAnimeList, getAnimeDoc, insertAnimeItem, deleteAnimeItem, updateAnimeItem } from '../apis/remote';
+import { getAnimeList, getAnimeDoc, insertAnimeItem, deleteAnimeItem, updateAnimeItem, uploadAnimeImage } from '../apis/remote';
 import { useAppDispatch } from '../app/hooks';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, ChangeEvent } from 'react';
 import { logout } from "../features/auth/authSlice"
+import { APISERVER_URL } from '../configs/remote'
 import { CheckCircleOutlined, MinusCircleOutlined, FileAddOutlined, DeleteOutlined } from '@ant-design/icons'
 // import { AnimeCard } from '../components/mikanani/AnimeCard';
 // import React from 'react';
 const { Meta } = Card;
 
 type AnimeInfo = {
-  uid: bigint,
+  uid: string,
   name: string,
   isActive: boolean,
   animeUrl: string,
@@ -43,26 +44,56 @@ export default function Mikanani() {
     // post-form
     const [addAnimeForm] = Form.useForm()
     const [modAnimeForm] = Form.useForm()
+    const [imageFile, setImageFile] = useState<File>();
     const dispatch = useAppDispatch()
 
     const showAddAnimeModal = () => setAddAnimeModalOpen(true)
     const showDelAnimeModal = () => setDelAnimeModalOpen(true)
     const showCheckAnimeModal = () => setCheckAnimeModalOpen(true)
     
-    const handleAddAnimeCancel = () => setAddAnimeModalOpen(false)
+    const beforeImageUpload = (event: ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files? event.target.files[0] : null
+      const isPng = file ? file.type === 'image/png' : false
+      const isOversize = file ? file.size / 1024 / 1024 > 4 : false
+      if (file && isPng && !isOversize) {
+        setImageFile(file)
+      }
+      if (!isPng) {
+        alert('Only png file.');
+      }
+      else if(isOversize) {
+        alert(`the pic size should less than 4MB.`)
+      }
+    };
+
+    const handleAddAnimeCancel = () => { 
+      setAddAnimeModalOpen(false)
+    }
     const handleAddAnimeOk = () => {
       setAddAnimeLoading(true)
       const {name, rss_url, regex, isActive, rule} = addAnimeForm.getFieldsValue()
-      // try {
-      //   const formatRegex = new RegExp(regex)
-      // } catch (error) {
-      //   alert(`Add failed: Invalid regex!`)
-      //   window.location.reload()
-      // }
 
       insertAnimeItem(name, rss_url, rule, regex, isActive)
-      .then(() => {
+      .then(({data}) => {
+        if (imageFile !== undefined) {
+          let uid = data.uid
+          uploadAnimeImage(uid, imageFile)
+          .then(() => {
+            alert("Add anime success!")
+            setImageFile(undefined)
+            window.location.reload()
+          })
+          .catch(error => {
+            switch(error.response.status) {
+              case 401: alert("login expired, please sign in again!"); dispatch(logout()); break;
+              default: console.log(error.response); alert("Upload image failed.")
+              setImageFile(undefined)
+            }
+          })
+        }
+
         alert("Add anime success!")
+        setImageFile(undefined)
         window.location.reload()
       })
       .catch(error => {
@@ -70,6 +101,7 @@ export default function Mikanani() {
           case 401: alert("login expired, please sign in again!"); dispatch(logout()); break;
         }
       })
+      setImageFile(undefined)
       setAddAnimeLoading(false)
       setAddAnimeModalOpen(false)
     }
@@ -105,7 +137,7 @@ export default function Mikanani() {
     const handleModAnimeOk = () => {
       setCheckAnimeLoading(true)
       const {name, isActive, regex, rule, rssUrl} = modAnimeForm.getFieldsValue()
-      const uid = checkAnimeInfo?.uid ?? BigInt(0)
+      const uid = checkAnimeInfo?.uid ?? "0"
       updateAnimeItem(uid, name, isActive, regex, rssUrl, rule)
       .then(() => {
         alert(`Update anime: ${name} config success!`)
@@ -116,6 +148,22 @@ export default function Mikanani() {
           case 401: alert("login expired, please sign in again!"); dispatch(logout()); break;
         }
       })
+
+      if (imageFile !== undefined) {
+        uploadAnimeImage(uid, imageFile)
+        .then(() => {
+          setImageFile(undefined)
+          window.location.reload()
+        })
+        .catch(error => {
+          setImageFile(undefined)
+          switch(error.response.status) {
+            case 401: alert("login expired, please sign in again!"); dispatch(logout()); break;
+            default: console.log(error.response); alert("Upload image failed.")
+          }
+        })
+      }
+
       setCheckAnimeLoading(false)
       setCheckAnimeModalOpen(false)
     }
@@ -125,10 +173,10 @@ export default function Mikanani() {
       .then(metas => {
         setAnimeList(metas.map(meta => {
           return {
-            uid: BigInt(meta.uid),
+            uid: meta.uid,
             name: meta.name,
             isActive: meta.isActive,
-            animeUrl: "/placeholder-anime.png"
+            animeUrl: `${APISERVER_URL}/mikanani/v2/anime/pics/${meta.uid}` // "/placeholder-anime.png"
           }
         }))
       })
@@ -153,9 +201,13 @@ export default function Mikanani() {
         unique-id={anime.uid}
         cover={
           <img
-            alt="example"
-            className="h-72 w-72"
+            alt="anime-image"
+            className="h-72 rounded-sm object-top object-cover border-8 border-transparent"
             src={anime.animeUrl}
+            onError={({ currentTarget }) => {
+              currentTarget.onerror = null; // prevents looping
+              currentTarget.src="/placeholder-anime.png"
+            }}
           />
         }
         extra={
@@ -167,6 +219,10 @@ export default function Mikanani() {
           }}/>] : []
         }
         onClick={ () => {
+          if (isManageMode) {
+              return
+          }
+
           let currAnimeInfo: AnimeInfo = {
             uid: anime.uid,
             name: anime.name,
@@ -265,6 +321,17 @@ export default function Mikanani() {
             <Switch defaultChecked className="bg-stone-200" />
           </Form.Item>
         </Form>
+
+        <label className="block">
+          <input type="file" className="block w-full text-sm text-slate-500
+            file:mr-4 file:py-2 file:px-4
+            file:rounded-md file:border-0
+            file:text-sm file:font-semibold
+            file:bg-slate-100 file:text-slate-500
+            hover:file:bg-slate-100"
+            onChange={beforeImageUpload}
+          />
+        </label>
       </Modal>
 
       {/* Delete anime modal */}
@@ -283,7 +350,7 @@ export default function Mikanani() {
       <Modal
         title="Anime details"
         key={checkAnimeInfo?.uid}
-        open={checkAnimeModalOpen}
+        open={checkAnimeModalOpen && !isManageMode}
         onOk={handleModAnimeOk}
         onCancel={handleCheckAnimeCancel}
         footer={[
@@ -315,6 +382,20 @@ export default function Mikanani() {
             <Switch disabled={!modAnimeMode} defaultChecked={checkAnimeInfo?.isActive}  className="bg-stone-200" />
           </Form.Item>
         </Form>
+        {
+          modAnimeMode && 
+          <label className="block">
+            <input type="file" className="block w-full text-sm text-slate-500
+              file:mr-4 file:py-2 file:px-4
+              file:rounded-md file:border-0
+              file:text-sm file:font-semibold
+              file:bg-slate-100 file:text-slate-500
+              hover:file:bg-slate-100"
+              onChange={beforeImageUpload}
+            />
+          </label>
+        }
+        
       </Modal>
     </>
 }

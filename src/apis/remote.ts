@@ -12,6 +12,10 @@ type GetAnimeListResponse = {
     metas: Array<Meta>,
 }
 
+type InsertAnimeItemResponse = {
+    uid: string,
+}
+
 type AnimeDoc = {
     uid: string,
     rssUrl: string,
@@ -33,7 +37,7 @@ const getAnimeList = async (start: bigint, end: bigint, status_filter: bigint) =
     return data.metas
 }
 
-const getAnimeDoc = async (uid: bigint) => {
+const getAnimeDoc = async (uid: string) => {
     const { data } = await axios.get<GetAnimeDocResponse>(
         `${APISERVER_URL}/mikanani/v2/anime/doc?uid=${uid}`, 
         {
@@ -44,7 +48,7 @@ const getAnimeDoc = async (uid: bigint) => {
 }
 
 const updateAnimeItem = async (
-    uid: bigint, name: string, isActive: boolean,
+    uid: string, name: string, isActive: boolean,
     regex: string, rssUrl: string, rule: string,
 ) => {
     await axios.put(
@@ -80,7 +84,7 @@ const updateAnimeItem = async (
 }
 
 const insertAnimeItem = async (name: string, rss_url: string, rule: string, regex: string, isActive: boolean) => {
-    const { status } = await axios.post(
+    const { status, data } = await axios.post<InsertAnimeItemResponse>(
         `${APISERVER_URL}/mikanani/v2/anime/insert`,
         {
             name: name,
@@ -98,7 +102,7 @@ const insertAnimeItem = async (name: string, rss_url: string, rule: string, rege
     )
     // for debug
     // console.log(data.metas)
-    return status
+    return { status: status, data: data }
 }
 
 const deleteAnimeItem = async (uid: string) => {
@@ -116,10 +120,26 @@ const deleteAnimeItem = async (uid: string) => {
     return status
 }
 
+const uploadAnimeImage = async (uid: string, imageFile: File) => {
+    const formData = new FormData()
+    formData.append('image', imageFile)
+    await axios.post(
+        `${APISERVER_URL}/mikanani/v2/anime/pics/upload/${uid}`,
+        formData,
+        {
+            withCredentials: true,
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        }
+    )
+}
+
 export {  
     getAnimeList,
     getAnimeDoc,
     insertAnimeItem,
     updateAnimeItem,
     deleteAnimeItem,
+    uploadAnimeImage
 }
