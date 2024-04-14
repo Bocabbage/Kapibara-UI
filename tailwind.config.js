@@ -26,9 +26,12 @@ export default {
           3: "#c46f4d",
           4: "#c86a58",
           5: "#c64e2f",
-        }
-      }
+        },
+      },
     },
   },
   plugins: [],
+  // corePlugins: {
+  //   preflight: false,
+  // },
 };

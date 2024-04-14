@@ -10,13 +10,18 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <Provider store={store}>
       <ConfigProvider
-          theme={{
-            token: {
-              colorPrimary: "#e45f2b",
-            },
-          }}
-        >
-      <App />
+        theme={{
+          token: {
+            colorPrimary: "#e45f2b",
+            fontFamily: "WorkSans-Medium",
+          },
+          components: {
+            // Button: {
+            // },
+          },
+        }}
+      >
+        <App />
       </ConfigProvider>
     </Provider>
   </React.StrictMode>,

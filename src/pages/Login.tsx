@@ -55,6 +55,7 @@ export default function Login() {
 
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
               <form className="space-y-6" onSubmit={handleSubmit(submitForm)}>
+                {/* Account Input */}
                 <div>
                   <div className="flex items-center justify-between">
                     <label className="block font-worksans-bold text-lg leading-6 text-gray-900">
@@ -72,6 +73,7 @@ export default function Login() {
                   </div>
                 </div>
 
+                {/* Password Input */}
                 <div>
                   <div className="flex items-center justify-between">
                     <label className="block font-worksans-bold text-lg leading-6 text-gray-900">
@@ -90,6 +92,7 @@ export default function Login() {
                   </div>
                 </div>
 
+                {/* Remember Switch */}
                 <div className="flex flex-row justify-end space-x-2 font-worksans-medium">
                   <p>Remember Me</p>
                   <div>
@@ -101,11 +104,12 @@ export default function Login() {
                   </div>
                 </div>
 
+                {/* Login Button */}
                 <div className="flex h-12 w-full justify-center">
                   <button
                     type="submit"
                     disabled={loading}
-                    className="login-button flex w-full justify-center rounded-lg bg-groovyfunk-4 p-2 font-worksans-bold text-lg text-[#FFFFFF] shadow-sm"
+                    className="login-button flex w-full justify-center rounded-lg bg-groovyfunk-4 p-2 font-worksans-bold text-lg text-[#FFFFFF] shadow-sm hover:bg-guavaguava-5"
                   >
                     Log in
                   </button>

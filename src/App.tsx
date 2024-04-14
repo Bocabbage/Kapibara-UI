@@ -11,6 +11,7 @@ import Login from "./pages/Login";
 import Admin from "./pages/Admin";
 import Mikanani from "./pages/Mikanani";
 import News from "./pages/News";
+import Logs from "./pages/Logs";
 import "./App.css";
 
 function App() {
@@ -44,6 +45,10 @@ function App() {
         {
           path: "news",
           element: <News />,
+        },
+        {
+          path: "logs",
+          element: <Logs />,
         },
       ],
       loader: authCheckLoader,

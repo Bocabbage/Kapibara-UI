@@ -1,2 +1,2 @@
-const STORE_USER_INFO_KEY = "kapibara_username";
+const STORE_USER_INFO_KEY = import.meta.env.VITE_STORE_USER_INFO_KEY;
 export { STORE_USER_INFO_KEY };

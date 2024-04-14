@@ -1,4 +1,4 @@
-import { Card, Tag, Modal, Form, Switch, Input, Button } from "antd";
+import { Card, Tag, Form, Pagination, FormInstance } from "antd";
 import {
   getAnimeList,
   getAnimeDoc,
@@ -17,21 +17,17 @@ import {
   FileAddOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
-// import { AnimeCard } from '../components/mikanani/AnimeCard';
-// import React from 'react';
+import { KButton } from "../components/common/Button";
+import { AnimeInfo } from "../components/common/Types";
+import { AddAnimeModal } from "../components/mikanani/AddAnimeModal";
+import { AnimeDetailModal } from "../components/mikanani/AnimeDetailModal";
+import { DelAnimeModal } from "../components/mikanani/DelAnimeModal";
 const { Meta } = Card;
 
-type AnimeInfo = {
-  uid: string;
-  name: string;
-  isActive: boolean;
-  animeUrl: string;
-  regex?: string;
-  rule?: string;
-  rssUrl?: string;
-};
-
 export default function Mikanani() {
+  {
+    /* ----------------- states ----------------- */
+  }
   const [animeList, setAnimeList] = useState(Array<AnimeInfo>);
 
   // Modal-open state
@@ -58,6 +54,9 @@ export default function Mikanani() {
   const [imageFile, setImageFile] = useState<File>();
   const dispatch = useAppDispatch();
 
+  {
+    /* ----------------- handlers ----------------- */
+  }
   const showAddAnimeModal = () => setAddAnimeModalOpen(true);
   const showDelAnimeModal = () => setDelAnimeModalOpen(true);
   const showCheckAnimeModal = () => setCheckAnimeModalOpen(true);
@@ -79,10 +78,10 @@ export default function Mikanani() {
   const handleAddAnimeCancel = () => {
     setAddAnimeModalOpen(false);
   };
-  const handleAddAnimeOk = () => {
+
+  const handleAddAnimeOk = (InputForm: FormInstance<any>) => {
     setAddAnimeLoading(true);
-    const { name, rss_url, regex, isActive, rule } =
-      addAnimeForm.getFieldsValue();
+    const { name, rss_url, regex, isActive, rule } = InputForm.getFieldsValue();
 
     insertAnimeItem(name, rss_url, rule, regex, isActive)
       .then(({ data }) => {
@@ -156,10 +155,10 @@ export default function Mikanani() {
     setModAnimeMode(false);
     setCheckAnimeModalOpen(false);
   };
-  const handleModAnimeOk = () => {
+
+  const handleModAnimeOk = (InputForm: FormInstance<any>) => {
     setCheckAnimeLoading(true);
-    const { name, isActive, regex, rule, rssUrl } =
-      modAnimeForm.getFieldsValue();
+    const { name, isActive, regex, rule, rssUrl } = InputForm.getFieldsValue();
     const uid = checkAnimeInfo?.uid ?? "0";
     updateAnimeItem(uid, name, isActive, regex, rssUrl, rule)
       .then(() => {
@@ -238,8 +237,7 @@ export default function Mikanani() {
         unique-id={anime.uid}
         cover={
           <img
-            alt="anime-image"
-            className="border-transparent h-72 rounded-sm border-8 object-cover object-top"
+            className="h-72 border-transparent object-cover object-top"
             src={anime.animeUrl}
             onError={({ currentTarget }) => {
               currentTarget.onerror = null; // prevents looping
@@ -254,7 +252,7 @@ export default function Mikanani() {
                 <DeleteOutlined
                   key={`${anime.name}-delbutton`}
                   unique-id={anime.uid}
-                  className="hover:bg-zinc-400"
+                  className="rounded-sm hover:bg-slate-100 hover:text-groovyfunk-4"
                   onClick={(event) => {
                     const toDelId = String(
                       event.currentTarget.getAttribute("unique-id"),
@@ -339,181 +337,64 @@ export default function Mikanani() {
 
   return (
     <>
-      <div className="bg-stone-50 flex h-full w-full flex-col">
+      {/* ----------------- Page ----------------- */}
+      <div className="flex h-full w-full flex-col bg-stone-50">
         {/* Header */}
-        <div className="basic-1/8 bg-stone-50 grid grid-cols-12">
+        <div className="basic-1/8 m-2 flex">
+          <div className="col-span-4 col-start-1 flex justify-start">
+            <Pagination defaultCurrent={1} total={22} />
+          </div>
+
           <div
             className="
-            login-button
-            basis-1/8 col-span-1 col-start-12 grid"
+            login-button col-span-1
+            mr-2 grid"
           >
-            <Button
+            <KButton
               key="modify"
-              style={{ margin: "4px" }}
+              text="Manage"
               onClick={() => setIsManageMode(!isManageMode)}
-            >
-              Manage
-            </Button>
+            />
           </div>
         </div>
         {/* Body */}
-        <div className="grid grid-cols-4 grid-rows-4">{cardItems}</div>
+        <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5">
+          {cardItems}
+        </div>
       </div>
 
+      {/* ----------------- Modals ----------------- */}
       {/* Add new anime modal */}
-      <Modal
-        title="Add new anime"
-        open={addAnimeModalOpen}
-        onOk={handleAddAnimeOk}
-        onCancel={handleAddAnimeCancel}
-        footer={[
-          <Button key="add-cancel" onClick={handleAddAnimeCancel}>
-            Cancel
-          </Button>,
-          <Button
-            loading={addAnimeLoading}
-            key="add-submit"
-            htmlType="submit"
-            onClick={handleAddAnimeOk}
-          >
-            Submit
-          </Button>,
-        ]}
-      >
-        <Form
-          form={addAnimeForm}
-          labelAlign="left"
-          labelCol={{ span: 4 }}
-          wrapperCol={{ span: 16 }}
-        >
-          <Form.Item required label="name" name="name">
-            <Input maxLength={100} />
-          </Form.Item>
-          <Form.Item required label="rule" name="rule">
-            <Input maxLength={100} />
-          </Form.Item>
-          <Form.Item required label="regex" name="regex">
-            <Input maxLength={100} />
-          </Form.Item>
-          <Form.Item required label="rss-url" name="rss_url">
-            <Input maxLength={100} />
-          </Form.Item>
-          <Form.Item
-            label="active"
-            name="isActive"
-            initialValue={true}
-            valuePropName="checked"
-          >
-            <Switch defaultChecked className="bg-stone-200" />
-          </Form.Item>
-        </Form>
-
-        <label className="block">
-          <input
-            type="file"
-            className="text-slate-500 file:bg-slate-100 file:text-slate-500 hover:file:bg-slate-100
-            block w-full text-sm
-            file:mr-4 file:rounded-md
-            file:border-0 file:px-4
-            file:py-2 file:text-sm
-            file:font-semibold"
-            onChange={beforeImageUpload}
-          />
-        </label>
-      </Modal>
+      <AddAnimeModal
+        addAnimeModalOpen={addAnimeModalOpen}
+        addAnimeLoading={addAnimeLoading}
+        addAnimeForm={addAnimeForm}
+        handleAddAnimeOk={handleAddAnimeOk}
+        handleAddAnimeCancel={handleAddAnimeCancel}
+        beforeImageUpload={beforeImageUpload}
+      />
 
       {/* Delete anime modal */}
-      <Modal
-        title="Delete anime"
-        open={delAnimeModalOpen}
-        footer={[
-          <Button key="del-cancel" onClick={handleDelAnimeCancel}>
-            No
-          </Button>,
-          <Button
-            loading={delAnimeLoading}
-            key="del-submit"
-            htmlType="submit"
-            onClick={handleDelAnimeOk}
-          >
-            Yes
-          </Button>,
-        ]}
-      >
-        You sure to delete the anime item(s) ?
-      </Modal>
+      <DelAnimeModal
+        delAnimeModalOpen={delAnimeModalOpen}
+        delAnimeLoading={delAnimeLoading}
+        handleDelAnimeCancel={handleDelAnimeCancel}
+        handleDelAnimeOk={handleDelAnimeOk}
+      />
 
       {/* Anime doc-check + Modify */}
-      <Modal
-        title="Anime details"
-        key={checkAnimeInfo?.uid}
-        open={checkAnimeModalOpen && !isManageMode}
-        onOk={handleModAnimeOk}
-        onCancel={handleCheckAnimeCancel}
-        footer={[
-          <Button key="mod-cancel" onClick={handleCheckAnimeCancel}>
-            Cancel
-          </Button>,
-          <Button
-            key="mod-modify"
-            onClick={() => setModAnimeMode(!modAnimeMode)}
-          >
-            Modify
-          </Button>,
-          modAnimeMode ? (
-            <Button
-              loading={checkAnimeLoading}
-              key="mod-submit"
-              htmlType="submit"
-              onClick={handleModAnimeOk}
-            >
-              Submit
-            </Button>
-          ) : null,
-        ]}
-      >
-        <Form
-          form={modAnimeForm}
-          labelAlign="left"
-          labelCol={{ span: 4 }}
-          wrapperCol={{ span: 16 }}
-          disabled={!modAnimeMode}
-        >
-          <Form.Item required label="name" name="name">
-            <Input maxLength={100} />
-          </Form.Item>
-          <Form.Item required label="rule" name="rule">
-            <Input maxLength={100} />
-          </Form.Item>
-          <Form.Item required label="regex" name="regex">
-            <Input maxLength={100} />
-          </Form.Item>
-          <Form.Item required label="rss-url" name="rssUrl">
-            <Input maxLength={100} />
-          </Form.Item>
-          <Form.Item label="active" name="isActive" valuePropName="checked">
-            <Switch
-              disabled={!modAnimeMode}
-              defaultChecked={checkAnimeInfo?.isActive}
-              className="bg-stone-200"
-            />
-          </Form.Item>
-        </Form>
-        {modAnimeMode && (
-          <label className="block">
-            <input
-              type="file"
-              className="text-slate-500 file:bg-slate-100 file:text-slate-500 hover:file:bg-slate-100
-              block w-full text-sm
-              file:mr-4 file:rounded-md
-              file:border-0 file:px-4
-              file:py-2 file:text-sm
-              file:font-semibold"
-              onChange={beforeImageUpload}
-            />
-          </label>
-        )}
-      </Modal>
+      <AnimeDetailModal
+        checkAnimeModalOpen={checkAnimeModalOpen}
+        isManageMode={isManageMode}
+        modAnimeMode={modAnimeMode}
+        checkAnimeLoading={checkAnimeLoading}
+        modAnimeForm={modAnimeForm}
+        checkAnimeInfo={checkAnimeInfo}
+        handleCheckAnimeCancel={handleCheckAnimeCancel}
+        handleModAnimeOk={handleModAnimeOk}
+        setModAnimeMode={setModAnimeMode}
+        beforeImageUpload={beforeImageUpload}
+      />
     </>
   );
 }
