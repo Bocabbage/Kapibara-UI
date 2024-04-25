@@ -6,6 +6,7 @@ import {
   deleteAnimeItem,
   updateAnimeItem,
   uploadAnimeImage,
+  getAnimeCount,
 } from "../apis/remote";
 import { useAppDispatch } from "../app/hooks";
 import { useEffect, useState, useRef, ChangeEvent } from "react";
@@ -28,6 +29,8 @@ export default function Mikanani() {
   {
     /* ----------------- states ----------------- */
   }
+  const [pageNum, setPageNum] = useState(1);
+  const [animeCount, setAnimeCount] = useState(0);
   const [animeList, setAnimeList] = useState(Array<AnimeInfo>);
 
   // Modal-open state
@@ -199,7 +202,19 @@ export default function Mikanani() {
   };
 
   useEffect(() => {
-    getAnimeList(BigInt(1), BigInt(10), BigInt(1))
+    getAnimeCount()
+      .then((count) => setAnimeCount(count))
+      .catch((error) => {
+        switch (error.response.status) {
+          case 401:
+            alert("login expired, please sign in again!");
+            dispatch(logout());
+            break;
+        }
+      });
+
+    let start = BigInt((pageNum - 1) * 10 + 1);
+    getAnimeList(start, start + BigInt(10), BigInt(1))
       .then((metas) => {
         setAnimeList(
           metas.map((meta) => {
@@ -207,6 +222,7 @@ export default function Mikanani() {
               uid: meta.uid,
               name: meta.name,
               isActive: meta.isActive,
+              bitmap: meta.bitmap,
               animeUrl: `${APISERVER_URL}/mikanani/v2/anime/pics/${meta.uid}`, // "/placeholder-anime.png"
             };
           }),
@@ -220,7 +236,7 @@ export default function Mikanani() {
             break;
         }
       });
-  }, []);
+  }, [pageNum]);
 
   animeList.sort((a, b) => {
     if (a.isActive == b.isActive) {
@@ -272,6 +288,7 @@ export default function Mikanani() {
           let currAnimeInfo: AnimeInfo = {
             uid: anime.uid,
             name: anime.name,
+            bitmap: anime.bitmap,
             isActive: anime.isActive,
             animeUrl: anime.animeUrl,
           };
@@ -342,7 +359,13 @@ export default function Mikanani() {
         {/* Header */}
         <div className="basic-1/8 m-2 flex">
           <div className="col-span-4 col-start-1 flex justify-start">
-            <Pagination defaultCurrent={1} total={22} />
+            <Pagination
+              current={Number(pageNum)}
+              total={animeCount}
+              onChange={(page) => {
+                setPageNum(page);
+              }}
+            />
           </div>
 
           <div

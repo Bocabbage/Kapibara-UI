@@ -2,6 +2,7 @@ import { SetStateAction } from "react";
 import { Modal, Form, Switch, Input, Button, Select, FormInstance } from "antd";
 import { ChangeEvent } from "react";
 import { AnimeInfo } from "../common/Types";
+import { VIDEOSERVER_URL } from "../../configs/remote";
 
 interface AnimeDetailModalProps {
   checkAnimeModalOpen: boolean;
@@ -28,18 +29,48 @@ export const AnimeDetailModal: React.FC<AnimeDetailModalProps> = ({
   setModAnimeMode,
   beforeImageUpload,
 }) => {
+  // Parse bitmap
+  const bitmapString: string = checkAnimeInfo?.bitmap || "0";
+  const bitmapArray: number[] = [];
+  for (let i = bitmapString.length - 1; i >= 0; i--) {
+    if (bitmapString[i] === "1") bitmapArray.push(bitmapString.length - 1 - i);
+  }
+
   const episodes: number[] = Array.from(
     { length: 24 },
     (_, index) => index + 1,
   );
-  let episodeItems = episodes.map((idx) => (
-    <div
-      className="col-span-1 rounded-md border-2 text-center text-gray-200"
-      key={`episode-${idx}`}
-    >
-      {idx}
-    </div>
-  ));
+  let episodeItems = episodes.map((idx) =>
+    bitmapArray.includes(idx) ? (
+      <a
+        key={`alink-${idx}`}
+        href={`${VIDEOSERVER_URL}/mikanani/medias/${checkAnimeInfo?.uid}/${idx}.mp4`}
+        target="_blank"
+      >
+        <div
+          className="
+          col-span-1 
+          rounded-md 
+          border-2 
+          border-groovyfunk-4 
+          bg-groovyfunk-4
+          text-center
+          text-white
+        "
+          key={`episode-${idx}`}
+        >
+          {idx}
+        </div>
+      </a>
+    ) : (
+      <div
+        className="col-span-1 rounded-md border-2 text-center text-gray-200"
+        key={`episode-${idx}`}
+      >
+        {idx}
+      </div>
+    ),
+  );
 
   return (
     <>

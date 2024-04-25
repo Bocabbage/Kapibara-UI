@@ -1,11 +1,13 @@
-const APISERVER_URL = import.meta.env.VITE_APISERVER_URL
-const REMOTE_TIMEOUT = import.meta.env.VITE_REMOTE_TIMEOUT
-const AUTH_BASE_URL = import.meta.env.VITE_AUTH_BASE_URL
-const AUTH_TOKEN_TYPE = import.meta.env.VITE_AUTH_TOKEN_TYPE
-const CLIENT_SALT = import.meta.env.VITE_CLIENT_SALT
+const APISERVER_URL = import.meta.env.VITE_APISERVER_URL;
+const VIDEOSERVER_URL = import.meta.env.VITE_VIDEOSERVER_URL;
+const REMOTE_TIMEOUT = import.meta.env.VITE_REMOTE_TIMEOUT;
+const AUTH_BASE_URL = import.meta.env.VITE_AUTH_BASE_URL;
+const AUTH_TOKEN_TYPE = import.meta.env.VITE_AUTH_TOKEN_TYPE;
+const CLIENT_SALT = import.meta.env.VITE_CLIENT_SALT;
 
 export {
   APISERVER_URL,
+  VIDEOSERVER_URL,
   REMOTE_TIMEOUT,
   AUTH_BASE_URL,
   AUTH_TOKEN_TYPE,

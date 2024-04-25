@@ -4,7 +4,12 @@ import { APISERVER_URL } from "../configs/remote";
 type Meta = {
   uid: string;
   name: string;
+  bitmap: string;
   isActive: boolean;
+};
+
+type GetAnimeCountResponse = {
+  count: number;
 };
 
 type GetAnimeListResponse = {
@@ -25,6 +30,16 @@ type AnimeDoc = {
 
 type GetAnimeDocResponse = {
   doc: AnimeDoc;
+};
+
+const getAnimeCount = async () => {
+  const { data } = await axios.get<GetAnimeCountResponse>(
+    `${APISERVER_URL}/mikanani/v2/anime/`,
+    {
+      withCredentials: true,
+    },
+  );
+  return data.count;
 };
 
 const getAnimeList = async (
@@ -150,6 +165,7 @@ const uploadAnimeImage = async (uid: string, imageFile: File) => {
 };
 
 export {
+  getAnimeCount,
   getAnimeList,
   getAnimeDoc,
   insertAnimeItem,
