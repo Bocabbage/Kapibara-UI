@@ -34,7 +34,7 @@ type GetAnimeDocResponse = {
 
 const getAnimeCount = async () => {
   const { data } = await axios.get<GetAnimeCountResponse>(
-    `${APISERVER_URL}/mikanani/v2/anime/`,
+    `${APISERVER_URL}/mikanani/v2/anime/anime-count`,
     {
       withCredentials: true,
     },
