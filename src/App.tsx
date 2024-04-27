@@ -5,8 +5,12 @@ import {
   redirect,
   LoaderFunctionArgs,
 } from "react-router-dom";
+import axios from "axios";
+import { logout } from "./features/auth/authSlice.ts";
+import { useAppDispatch } from "./app/hooks.ts";
 import { useAppSelector } from "./app/hooks";
 // import { AxiosInterceptor } from './app/services/request/interceptors'
+import Home from "./pages/Home.tsx";
 import Login from "./pages/Login";
 import Admin from "./pages/Admin";
 import Mikanani from "./pages/Mikanani";
@@ -15,6 +19,22 @@ import Logs from "./pages/Logs";
 import "./App.css";
 
 function App() {
+  const dispatch = useAppDispatch();
+  axios.interceptors.response.use(
+    (response) => {
+      return response;
+    },
+    (error) => {
+      switch (error.response.status) {
+        case 401:
+          alert("login expired, please sign in again!");
+          dispatch(logout());
+          break;
+      }
+      return Promise.reject(error);
+    },
+  );
+
   const { userName } = useAppSelector((state) => state.auth);
 
   const authCheckLoader = ({ request }: LoaderFunctionArgs) => {
@@ -28,6 +48,11 @@ function App() {
   };
 
   const router = createBrowserRouter([
+    {
+      id: "home",
+      path: "/",
+      element: <Home />,
+    },
     {
       id: "login",
       path: "login/",

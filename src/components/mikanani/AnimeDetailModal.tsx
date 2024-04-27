@@ -30,7 +30,10 @@ export const AnimeDetailModal: React.FC<AnimeDetailModalProps> = ({
   beforeImageUpload,
 }) => {
   // Parse bitmap
-  const bitmapString: string = checkAnimeInfo?.bitmap || "0";
+  const bitmapDecString: string = checkAnimeInfo?.bitmap || "0";
+  const num = parseInt(bitmapDecString, 10);
+  let bitmapString = num.toString(2);
+
   const bitmapArray: number[] = [];
   for (let i = bitmapString.length - 1; i >= 0; i--) {
     if (bitmapString[i] === "1") bitmapArray.push(bitmapString.length - 1 - i);

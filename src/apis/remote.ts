@@ -1,10 +1,10 @@
-import axios from "axios";
 import { APISERVER_URL } from "../configs/remote";
+import axios from "axios";
 
 type Meta = {
   uid: string;
   name: string;
-  bitmap: string;
+  downloadBitmap: string;
   isActive: boolean;
 };
 
@@ -13,8 +13,8 @@ type GetAnimeCountResponse = {
 };
 
 type GetAnimeListResponse = {
-  count: bigint;
-  metas: Array<Meta>;
+  itemCount: bigint;
+  animeMetas: Array<Meta>;
 };
 
 type InsertAnimeItemResponse = {
@@ -29,7 +29,7 @@ type AnimeDoc = {
 };
 
 type GetAnimeDocResponse = {
-  doc: AnimeDoc;
+  animeDoc: AnimeDoc;
 };
 
 const getAnimeCount = async () => {
@@ -43,27 +43,27 @@ const getAnimeCount = async () => {
 };
 
 const getAnimeList = async (
-  start: bigint,
-  end: bigint,
-  status_filter: bigint,
+  startIndex: bigint,
+  endIndex: bigint,
+  statusFilter: bigint,
 ) => {
   const { data } = await axios.get<GetAnimeListResponse>(
-    `${APISERVER_URL}/mikanani/v2/anime/list-meta?start=${start}&status_filter=${status_filter}&end=${end}`,
+    `${APISERVER_URL}/mikanani/v2/anime/list-meta?startIndex=${startIndex}&statusFilter=${statusFilter}&endIndex=${endIndex}`,
     {
       withCredentials: true,
     },
   );
-  return data.metas;
+  return data.animeMetas;
 };
 
 const getAnimeDoc = async (uid: string) => {
   const { data } = await axios.get<GetAnimeDocResponse>(
-    `${APISERVER_URL}/mikanani/v2/anime/doc?uid=${uid}`,
+    `${APISERVER_URL}/mikanani/v2/anime/doc/${uid}`,
     {
       withCredentials: true,
     },
   );
-  return data.doc;
+  return data.animeDoc;
 };
 
 const updateAnimeItem = async (
@@ -77,9 +77,11 @@ const updateAnimeItem = async (
   await axios.put(
     `${APISERVER_URL}/mikanani/v2/anime/update-meta`,
     {
-      uid: uid.toString(),
-      name: name,
-      is_active: isActive ? 1 : -1,
+      updateAnimeMeta: {
+        uid: uid.toString(),
+        name: name,
+        is_active: isActive ? 1 : -1,
+      },
     },
     {
       withCredentials: true,
@@ -113,14 +115,18 @@ const insertAnimeItem = async (
   regex: string,
   isActive: boolean,
 ) => {
-  const { status, data } = await axios.post<InsertAnimeItemResponse>(
+  const { status, data } = await axios.put<InsertAnimeItemResponse>(
     `${APISERVER_URL}/mikanani/v2/anime/insert`,
     {
-      name: name,
-      rss_url: rss_url,
-      rule: rule,
-      regex: regex,
-      is_active: isActive ? 1 : -1,
+      insertAnimeMeta: {
+        name: name,
+        isActive: isActive ? 1 : -1,
+      },
+      insertAnimeDoc: {
+        rssUrl: rss_url,
+        rule: rule,
+        regex: regex,
+      },
     },
     {
       withCredentials: true,
@@ -136,7 +142,7 @@ const insertAnimeItem = async (
 
 const deleteAnimeItem = async (uid: string) => {
   const { status } = await axios.delete(
-    `${APISERVER_URL}/mikanani/v2/anime/delete?uid=${uid}`,
+    `${APISERVER_URL}/mikanani/v2/anime/delete/${uid}`,
     {
       withCredentials: true,
       headers: {
@@ -153,7 +159,7 @@ const uploadAnimeImage = async (uid: string, imageFile: File) => {
   const formData = new FormData();
   formData.append("image", imageFile);
   await axios.post(
-    `${APISERVER_URL}/mikanani/v2/anime/pics/upload/${uid}`,
+    `${APISERVER_URL}/mikanani/v2/pics/upload/${uid}`,
     formData,
     {
       withCredentials: true,

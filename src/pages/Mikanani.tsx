@@ -8,9 +8,7 @@ import {
   uploadAnimeImage,
   getAnimeCount,
 } from "../apis/remote";
-import { useAppDispatch } from "../app/hooks";
 import { useEffect, useState, useRef, ChangeEvent } from "react";
-import { logout } from "../features/auth/authSlice";
 import { APISERVER_URL } from "../configs/remote";
 import {
   CheckCircleOutlined,
@@ -55,7 +53,6 @@ export default function Mikanani() {
   const [addAnimeForm] = Form.useForm();
   const [modAnimeForm] = Form.useForm();
   const [imageFile, setImageFile] = useState<File>();
-  const dispatch = useAppDispatch();
 
   {
     /* ----------------- handlers ----------------- */
@@ -97,16 +94,9 @@ export default function Mikanani() {
               window.location.reload();
             })
             .catch((error) => {
-              switch (error.response.status) {
-                case 401:
-                  alert("login expired, please sign in again!");
-                  dispatch(logout());
-                  break;
-                default:
-                  console.log(error.response);
-                  alert("Upload image failed.");
-                  setImageFile(undefined);
-              }
+              console.log(error.response);
+              alert("Upload image failed.");
+              setImageFile(undefined);
             });
         }
 
@@ -115,12 +105,8 @@ export default function Mikanani() {
         window.location.reload();
       })
       .catch((error) => {
-        switch (error.response.status) {
-          case 401:
-            alert("login expired, please sign in again!");
-            dispatch(logout());
-            break;
-        }
+        alert("Unexpected error happened.");
+        console.log(`[InsertAnimeItem]${error.response}`);
       });
     setImageFile(undefined);
     setAddAnimeLoading(false);
@@ -141,12 +127,8 @@ export default function Mikanani() {
           window.location.reload();
         })
         .catch((error) => {
-          switch (error.response.status) {
-            case 401:
-              alert("login expired, please sign in again!");
-              dispatch(logout());
-              break;
-          }
+          alert("Unexpected error happened.");
+          console.log(`[DeleteAnimeItem]${error.response}`);
         });
     }
     toDeleteIds.current.splice(0, toDeleteIds.current.length); // empty the array
@@ -169,12 +151,8 @@ export default function Mikanani() {
         window.location.reload();
       })
       .catch((error) => {
-        switch (error.response.status) {
-          case 401:
-            alert("login expired, please sign in again!");
-            dispatch(logout());
-            break;
-        }
+        alert("Unexpected error happened.");
+        console.log(`[UpdateAnimeItem]${error.response}`);
       });
 
     if (imageFile !== undefined) {
@@ -185,15 +163,8 @@ export default function Mikanani() {
         })
         .catch((error) => {
           setImageFile(undefined);
-          switch (error.response.status) {
-            case 401:
-              alert("login expired, please sign in again!");
-              dispatch(logout());
-              break;
-            default:
-              console.log(error.response);
-              alert("Upload image failed.");
-          }
+          alert("Unexpected error happened.");
+          console.log(`[uploadAnimeImage]${error.response}`);
         });
     }
 
@@ -205,12 +176,8 @@ export default function Mikanani() {
     getAnimeCount()
       .then((count) => setAnimeCount(count))
       .catch((error) => {
-        switch (error.response.status) {
-          case 401:
-            alert("login expired, please sign in again!");
-            dispatch(logout());
-            break;
-        }
+        alert("Unexpected error happened.");
+        console.log(`[getAnimeCount]${error.response}`);
       });
 
     let start = BigInt((pageNum - 1) * 10 + 1);
@@ -222,19 +189,15 @@ export default function Mikanani() {
               uid: meta.uid,
               name: meta.name,
               isActive: meta.isActive,
-              bitmap: meta.bitmap,
-              animeUrl: `${APISERVER_URL}/mikanani/v2/anime/pics/${meta.uid}`, // "/placeholder-anime.png"
+              bitmap: meta.downloadBitmap,
+              animeUrl: `${APISERVER_URL}/mikanani/v2/pics/${meta.uid}`, // "/placeholder-anime.png"
             };
           }),
         );
       })
       .catch((error) => {
-        switch (error.response.status) {
-          case 401:
-            alert("login expired, please sign in again!");
-            dispatch(logout());
-            break;
-        }
+        alert("Unexpected error happened.");
+        console.log(`[getAnimeList]${error.response}`);
       });
   }, [pageNum]);
 
@@ -303,12 +266,8 @@ export default function Mikanani() {
               showCheckAnimeModal();
             })
             .catch((error) => {
-              switch (error.response.status) {
-                case 401:
-                  alert("login expired, please sign in again!");
-                  dispatch(logout());
-                  break;
-              }
+              alert("Unexpected error happened.");
+              console.log(`[getAnimeDoc]${error.response}`);
             });
         }}
         hoverable

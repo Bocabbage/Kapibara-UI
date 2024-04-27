@@ -20,7 +20,7 @@ export default function Login() {
   useEffect(() => {
     if (userName !== null) {
       // [todo] enhancement
-      navigate("/Admin");
+      navigate("/admin");
     }
   }, [userName]);
 
