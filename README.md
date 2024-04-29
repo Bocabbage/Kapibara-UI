@@ -14,7 +14,7 @@
 ### Features
 
 - [x] Add / Delete / Update rss-subscribe
-- [ ] Current downloaded display
+- [x] Current downloaded display
 - [ ] Update notification
-- [ ] Video play
+- [x] Video play
 - [ ] Log monitor
