@@ -94,10 +94,12 @@ const updateAnimeItem = async (
   await axios.put(
     `${APISERVER_URL}/mikanani/v2/anime/update-doc`,
     {
-      uid: uid.toString(),
-      rule: rule,
-      rss_url: rssUrl,
-      regex: regex,
+      updateAnimeDoc: {
+        uid: uid.toString(),
+        rule: rule,
+        rss_url: rssUrl,
+        regex: regex,
+      }
     },
     {
       withCredentials: true,
@@ -115,7 +117,7 @@ const insertAnimeItem = async (
   regex: string,
   isActive: boolean,
 ) => {
-  const { status, data } = await axios.put<InsertAnimeItemResponse>(
+  const { status, data } = await axios.post<InsertAnimeItemResponse>(
     `${APISERVER_URL}/mikanani/v2/anime/insert`,
     {
       insertAnimeMeta: {
