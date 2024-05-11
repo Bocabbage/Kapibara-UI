@@ -80,7 +80,7 @@ const updateAnimeItem = async (
       updateAnimeMeta: {
         uid: uid.toString(),
         name: name,
-        is_active: isActive ? 1 : -1,
+        isActive: isActive ? 1 : -1,
       },
     },
     {
@@ -97,7 +97,7 @@ const updateAnimeItem = async (
       updateAnimeDoc: {
         uid: uid.toString(),
         rule: rule,
-        rss_url: rssUrl,
+        rssUrl: rssUrl,
         regex: regex,
       }
     },
